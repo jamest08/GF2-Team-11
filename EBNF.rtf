@@ -1,0 +1,27 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2578
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 digit = ( \'930\'94 | \'931\'94 | \'932\'94 | \'933\'94 | \'934\'94 | \'935\'94 | \'936\'94 | \'937\'94 | \'938\'94 | \'939\'94) ;\
+letter = (\'93A\'94 | \'93B\'94 | \'93C\'94 | \'93D\'94 | \'93E\'94 | \'93F\'94 | \'93G\'94 | \'93H\'94 | \'93I\'94 | \'93J\'94 | \'93K\'94 | \'93L\'94 | \'93M\'94 | \'93N\'94 | \'93O\'94 | \'93P\'94 | \'93Q\'94 | \'93R\'94 | \'93S\'94 | \'93T\'94 | \'93U\'94 | \'93V\'94 | \'93W\'94 | \'93X\'94 | \'93Y\'94 | \'93Z\'94) ;\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+file = \{definition\}, \{connection\}, \{monitor\} ;\
+\
+definition =  \'93define\'94, name, \'93as\'94, (\'93XOR\'94 | \'93DTYPE\'94 | switch | gate | clock), \'93;\'94 ;\
+switch = \'93SWITCH\'94, (\'93open\'94 | \'93closed\'94) ;\
+gate = (\'93NAND\'94 | \'93AND\'94 | \'93OR\'94 | \'93NOR\'94 ), \{digit\}, \'93inputs\'94;\
+clock = \'93CLOCK\'94, \'93period\'94, \{digit\} ;\
+name = \{\'93letter\'94 | \'93digit\'94\} ;\
+\
+connection = \'93connect\'94, output, \'93to\'94, input, \'93;\'94 ;\
+output = name, [\'93Q\'94 | \'93QBAR\'94] ;\
+input = name, \'93.\'94, (\'93DATA\'94 | \'93CLK\'94 | \'93SET\'94 | \'93CLEAR\'94 | \'93I\'94, \{digit\}) ;\
+\
+monitor = \'93monitor\'94, output, \'93;\'94 ;\
+\
+\
+}
