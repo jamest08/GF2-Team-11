@@ -7,8 +7,8 @@
 
 \f0\fs24 \cf0 digit = ( \'930\'94 | \'931\'94 | \'932\'94 | \'933\'94 | \'934\'94 | \'935\'94 | \'936\'94 | \'937\'94 | \'938\'94 | \'939\'94) ;\
 \
-definition =  \'93define\'94, name, \'93as\'94, (\'93XOR\'94 | \'93DTYPE\'94 | switch | gate | clock), \'93;\'94 ;\
-switch = \'93SWITCH\'94, (\'93open\'94 | \'93closed\'94) ;\
+definition =  \'93define\'94, name, \{name\}, \'93as\'94, (\'93XOR\'94 | \'93DTYPE\'94 | switch | gate | clock), \'93;\'94 ;\
+switch = \'93SWITCH\'94, (\'930\'94 | \'931\'94), \'93state\'94 ;\
 gate = (\'93NAND\'94 | \'93AND\'94 | \'93OR\'94 | \'93NOR\'94 ), \{digit\}, \'93inputs\'94;\
 clock = \'93CLOCK\'94, \'93period\'94, \{digit\} ;\
 name = (\'93G\'94, \{digit\} | \'93SW\'94, \{digit\} | \'93CL\'94, \{digit\});\
@@ -17,7 +17,7 @@ connection = \'93connect\'94, output, \'93to\'94, input, \'93;\'94 ;\
 output = name, [\'93Q\'94 | \'93QBAR\'94] ;\
 input = name, \'93.\'94, (\'93DATA\'94 | \'93CLK\'94 | \'93SET\'94 | \'93CLEAR\'94 | \'93I\'94, \{digit\}) ;\
 \
-monitor = \'93monitor\'94, output, \'93;\'94 ;\
+monitor = \'93monitor\'94, \{output\}, \'93;\'94 ;\
 \
 \
 }
