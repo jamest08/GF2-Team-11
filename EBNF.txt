@@ -1,5 +1,7 @@
 digit = ( “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9”) ;
 
+file = {definition | connection | monitor}, "END" ;
+
 definition =  “define”, name, {name}, “as”, (“XOR” | “DTYPE” | switch | gate | clock), “;” ;
 switch = “SWITCH”, (“0” | “1”), “state” ;
 gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
