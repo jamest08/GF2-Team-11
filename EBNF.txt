@@ -1,0 +1,16 @@
+digit = ( “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9”) ;
+
+definition =  “define”, name, {name}, “as”, (“XOR” | “DTYPE” | switch | gate | clock), “;” ;
+switch = “SWITCH”, (“0” | “1”), “state” ;
+gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
+clock = “CLOCK”, “period”, digit, {digit} ;
+name = (“G”, digit, {digit} | “SW”, digit, {digit} | “CL”, digit, {digit} | “D”, digit, {digit}) ;
+
+connection = “connect”, output, “to”, input, “;” ;
+output = name, “.”, [“Q” | “QBAR”] ;
+input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
+
+monitor = “monitor”, output, {output}, “;” ;
+
+
+
