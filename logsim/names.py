@@ -10,7 +10,6 @@ Names - maps variable names and string names to unique integers.
 
 
 class Names:
-
     """Map variable names and string names to unique integers.
 
     This class deals with storing grammatical keywords and user-defined words,
@@ -40,6 +39,7 @@ class Names:
 
     def __init__(self):
         """Initialise names list."""
+        self.names_list = []
         self.error_code_count = 0  # how many error codes have been declared
 
     def unique_error_codes(self, num_error_codes):
@@ -55,15 +55,56 @@ class Names:
 
         If the name string is not present in the names list, return None.
         """
+        if isinstance(name_string, str):
+            try:
+                return self.names_list.index(name_string)
+            except ValueError:  # exception thrown if name not in list
+                return None
+        else:
+            raise TypeError("Expected name_string to be string.")
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
 
         If the name string is not present in the names list, add it.
         """
+        if isinstance(name_string_list, list):
+            name_id_list = []
+            for name_string in name_string_list:
+                if isinstance(name_string, str):
+                    try:
+                        name_id_list.append(self.names_list.index(name_string))
+                    except ValueError:  # exception thrown if name not in list
+                        self.names_list.append(name_string)
+                        name_id_list.append(len(self.names_list) - 1)
+                else:
+                    raise TypeError("Expected list item to be string.")
+            return name_id_list
+        else:
+            raise TypeError("Expected name_string_list to be list.")
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
 
         If the name_id is not an index in the names list, return None.
         """
+        if isinstance(name_id, int):
+            if name_id < len(self.names_list) and name_id >= 0:  # if id exists
+                return self.names_list[name_id]
+            elif name_id < 0:  # if invalid name_id value
+                raise ValueError
+            else:  # if name_id not in names list
+                return None
+        else:
+            raise TypeError("Expected name_id to be integer.")
+
+
+"""quick tests
+names = Names()
+print(names.lookup(['144', 'hello', 'james', '144']))
+print(names.lookup(['144', '6']))
+print(names.query('james'))
+print(names.query(' '))
+print(names.get_name_string(3))
+print(names.names_list)
+"""
