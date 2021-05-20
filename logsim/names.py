@@ -42,10 +42,13 @@ class Names:
         self.names_list = []
         self.error_code_count = 0  # how many error codes have been declared
 
+    # edited pre-written method to include ValueError
     def unique_error_codes(self, num_error_codes):
         """Return a list of unique integer error codes."""
         if not isinstance(num_error_codes, int):
             raise TypeError("Expected num_error_codes to be an integer.")
+        elif num_error_codes <= 0:
+            raise ValueError("Expected num_error_codes > 0.")
         self.error_code_count += num_error_codes
         return range(self.error_code_count - num_error_codes,
                      self.error_code_count)
