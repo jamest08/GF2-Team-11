@@ -77,20 +77,21 @@ def test_unique_error_codes_raises_exceptions(used_names):
         used_names.unique_error_codes("hello")
     with pytest.raises(ValueError):
         used_names.unique_error_codes(-1)
-    
+
 
 def test_unique_error_codes(used_names):
     """Test if unique_error_codes provides the expected output"""
     # Confirm 4 codes currently
-    assert used_names.unique_error_codes(3) == range(0,3)
+    assert used_names.unique_error_codes(3) == range(0, 3)
     # Confirm new code is added
-    assert used_names.unique_error_codes(3) == range(3,6)
+    assert used_names.unique_error_codes(3) == range(3, 6)
 
 
 def test_query_raises_exceptions(used_names):
     """Test if query raises the expected exceptions"""
     with pytest.raises(TypeError):
         used_names.query(1.4)
+
 
 @pytest.mark.parametrize("name_string, expected_id", [
     ("James", 0),
@@ -102,4 +103,4 @@ def test_query(used_names, name_string, expected_id):
     # Name is present
     assert used_names.query(name_string) == expected_id
     # Name gets added
-    assert used_names.query("Bob") == None
+    assert used_names.query("Bob") is None
