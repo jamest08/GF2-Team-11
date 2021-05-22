@@ -71,6 +71,7 @@ class Scanner:
         self.QBAR_ID, self.DATA_ID, self.CLK_ID, self.SET_ID, 
         self.CLEAR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
+        file= self.open_file(path)
 
 
     def get_symbol(self,path):
@@ -85,22 +86,27 @@ class Scanner:
             else:
                 symbol.type = self.NAME
             [symbol.id] = self.names.lookup([name_string])
+            symbol.pos = file.tell()
 
         elif self.current_character.isdigit(): # number
             num = self.get_number()
             symbol.id = self.names.lookup([num])
             symbol.type = self.NUMBER
+            symbol.pos = file.tell()
 
         elif self.current_character == ".": # punctuation
             symbol.type = self.FULLSTOP
-            symbol.id = self.names.lookup([.])
+            symbol.id = self.names.lookup(["."])
+            symbol.pos = file.tell()
 
         elif self.current_character == ";":
             symbol.type = self.SEMICOLON
-            symbol.id = self.names.lookup([;])
+            symbol.id = self.names.lookup([";"])
+            symbol.pos = file.tell()
 
         else: # not a valid character
             symbol.type = self.INVALID
+            symbol.pos = file.tell()
 
         return symbol
     
@@ -110,10 +116,52 @@ class Scanner:
         return(file)
 
     def skip_spaces(self,path):
-        file= open_file(path)
+        file= self.open_file(path)
         z = file.read(1)
         
         while z.isspace()==True:
             z=file.read(1)
              
-        return(z)
+        self.current_character = z
+    
+    def get_name(self):
+        isname = False
+
+        while isname == False :
+            z = self.current_character
+            
+            name=[]
+            if z.isalpha() == True:
+             
+                name.append(z)
+                nextchar=file.read(1)
+            
+                while nextchar.isalnum()==True:
+                    name.append(nextchar)
+                 
+                    nextchar=file.read(1)
+                isname=True
+                na=''.join(name)
+                return(na)
+            
+            if z =='':
+                return ''
+
+    def get_number(self):
+        z= self.current_character
+        number=[]
+
+        if z.isdigit() == True:
+             
+                number.append(z)
+                nextnum=file.read(1)
+            
+                while nextnum.isdigit()==True:
+                    number.append(nextnum)
+                 
+                    nextnum=file.read(1)
+                
+                n=''.join(number)
+                return(n)
+
+        
