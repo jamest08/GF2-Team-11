@@ -9,6 +9,7 @@ Scanner - reads definition file and translates characters into symbols.
 Symbol - encapsulates a symbol and stores its properties.
 """
 
+from names import Names
 
 class Symbol:
 
@@ -25,7 +26,7 @@ class Symbol:
     No public methods.
     """
 
-    def __init__(self,type,id,pos):
+    def __init__(self,type=None,id=None,pos=None):
         """Initialise symbol properties."""
         self.type = type
         self.id = id
@@ -71,13 +72,14 @@ class Scanner:
         self.QBAR_ID, self.DATA_ID, self.CLK_ID, self.SET_ID, 
         self.CLEAR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
-        file= self.open_file(path)
+        self.path = path
+        self.file= self.open_file(self.path)
 
 
-    def get_symbol(self,path):
+    def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
-        self.skip_spaces(path) # current character now not whitespace
+        self.skip_spaces() # current character now not whitespace
 
         if self.current_character.isalpha(): # name
             name_string = self.get_name()
@@ -86,41 +88,41 @@ class Scanner:
             else:
                 symbol.type = self.NAME
             [symbol.id] = self.names.lookup([name_string])
-            symbol.pos = file.tell()
+            symbol.pos = self.file.tell()
 
         elif self.current_character.isdigit(): # number
             num = self.get_number()
             symbol.id = self.names.lookup([num])
             symbol.type = self.NUMBER
-            symbol.pos = file.tell()
+            symbol.pos = self.file.tell()
 
         elif self.current_character == ".": # punctuation
             symbol.type = self.FULLSTOP
             symbol.id = self.names.lookup(["."])
-            symbol.pos = file.tell()
+            symbol.pos = self.file.tell()
 
         elif self.current_character == ";":
             symbol.type = self.SEMICOLON
             symbol.id = self.names.lookup([";"])
-            symbol.pos = file.tell()
+            symbol.pos = self.file.tell()
 
         else: # not a valid character
             symbol.type = self.INVALID
-            symbol.pos = file.tell()
+            symbol.pos = self.file.tell()
 
         return symbol
     
-    def open_file(path):
+    def open_file(self,path):
         """Open and return the file specified by path."""
-        file =open(path, "r")
+        file =open(self.path, "r")
         return(file)
 
-    def skip_spaces(self,path):
-        file= self.open_file(path)
-        z = file.read(1)
+    def skip_spaces(self):
+        
+        z = self.file.read(1)
         
         while z.isspace()==True:
-            z=file.read(1)
+            z=self.file.read(1)
              
         self.current_character = z
     
@@ -134,12 +136,12 @@ class Scanner:
             if z.isalpha() == True:
              
                 name.append(z)
-                nextchar=file.read(1)
+                nextchar=self.file.read(1)
             
                 while nextchar.isalnum()==True:
                     name.append(nextchar)
                  
-                    nextchar=file.read(1)
+                    nextchar=self.file.read(1)
                 isname=True
                 na=''.join(name)
                 return(na)
@@ -154,14 +156,21 @@ class Scanner:
         if z.isdigit() == True:
              
                 number.append(z)
-                nextnum=file.read(1)
+                nextnum=self.file.read(1)
             
                 while nextnum.isdigit()==True:
                     number.append(nextnum)
                  
-                    nextnum=file.read(1)
+                    nextnum=self.file.read(1)
                 
                 n=''.join(number)
                 return(n)
 
-        
+""" rough tests
+names = Names()
+path= 'C:'+'\\'+'Users'+'\\'+'annam'+'\\'+'Documents'+'\\'+'aauni'+'\\'+'Part2'+'\\'+'GF2'+'\\'+'prelim'+'\\'+'prelim'+'\\'+'example.txt'
+scanner= Scanner(path, names)
+sym1= scanner.get_symbol()
+sym2= scanner.get_symbol()
+sym3= scanner.get_symbol()
+print(sym1, sym2,sym3)"""
