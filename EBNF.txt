@@ -18,7 +18,7 @@ clock = “CLOCK”, “period”, digit, {digit} ;
 name = letter, {letter | digit} ;
 
 connection = “connect”, output, “to”, input, “;” ;
-output = name, “.”, [“Q” | “QBAR”] ;
+output = name, [“.Q” | “.QBAR”] ;
 input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
 
 monitor = “monitor”, output, {output}, “;” ;
