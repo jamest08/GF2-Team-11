@@ -26,11 +26,12 @@ class Symbol:
     No public methods.
     """
 
-    def __init__(self,type=None,id=None,pos=None):
+    def __init__(self,type=None,id=None,pos=None,line=None):
         """Initialise symbol properties."""
         self.type = type
         self.id = id
         self.pos = pos
+        self.line = line
 
 
 class Scanner:
@@ -80,6 +81,9 @@ class Scanner:
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces() # current character now not whitespace
+
+        if self.current_character == "#":
+            self.skip_comment()
 
         if self.current_character.isalpha(): # name
             name_string = self.get_name()
@@ -165,10 +169,19 @@ class Scanner:
                 
                 n=''.join(number)
                 return(n)
+    def skip_comment(self):
+        z = self.file.read(1)
+        
+        while z != "#":
+            z=self.file.read(1)
 
-""" rough tests
+        z=self.file.read(1)  
+        self.current_character = z
+
+
+ """#rough tests
 names = Names()
-path= 'C:'+'\\'+'Users'+'\\'+'annam'+'\\'+'Documents'+'\\'+'aauni'+'\\'+'Part2'+'\\'+'GF2'+'\\'+'prelim'+'\\'+'prelim'+'\\'+'example.txt'
+path= 'C:'+'\\'+'Users'+'\\'+'annam'+'\\'+'Documents'+'\\'+'aauni'+'\\'+'Part2'+'\\'+'GF2'+'\\'+'GF2-Team-11'+'\\'+'logsim'+'\\'+'example.rtf'
 scanner= Scanner(path, names)
 sym1= scanner.get_symbol()
 sym2= scanner.get_symbol()
