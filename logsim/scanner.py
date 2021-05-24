@@ -75,6 +75,8 @@ class Scanner:
         self.current_character = ""
         self.path = path
         self.file= self.open_file(self.path)
+        self.error_count = 0
+        
 
 
     def get_symbol(self):
@@ -113,6 +115,7 @@ class Scanner:
         else: # not a valid character
             symbol.type = self.INVALID
             symbol.pos = self.file.tell()
+
 
         return symbol
     
@@ -169,6 +172,7 @@ class Scanner:
                 
                 n=''.join(number)
                 return(n)
+
     def skip_comment(self):
         z = self.file.read(1)
         
@@ -178,8 +182,14 @@ class Scanner:
         z=self.file.read(1)  
         self.current_character = z
 
+    def display_error(self, error_message):
+        print(self.file.readline())
+        print("^")
+        self.error_count += 1
+        print("***ERROR:{}".format(error_message))
 
- """#rough tests
+
+"""#rough tests
 names = Names()
 path= 'C:'+'\\'+'Users'+'\\'+'annam'+'\\'+'Documents'+'\\'+'aauni'+'\\'+'Part2'+'\\'+'GF2'+'\\'+'GF2-Team-11'+'\\'+'logsim'+'\\'+'example.rtf'
 scanner= Scanner(path, names)
