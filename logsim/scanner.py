@@ -29,7 +29,7 @@ class Symbol:
     No public methods.
     """
 
-    def __init__(self, type=None, id=None, pos=None, line=None):
+    def __init__(self, type = None, id = None, pos = None, line = None):
         """Initialise symbol properties."""
         self.type = type
         self.id = id
@@ -61,7 +61,11 @@ class Scanner:
 
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
-        self.names = names
+        
+        if isinstance(names, Names) is True:
+            self.names = names
+        else:
+            raise TypeError("names arguments not an instance of Names class")
         self.symbol_type_list = [self.FULLSTOP, self.SEMICOLON,
         self.KEYWORD, self.NUMBER, self.NAME, self.INVALID] = range(6)
         self.keywords_list = ["define", "connect", "monitor", 
@@ -200,19 +204,15 @@ class Scanner:
     def display_error(self, error_message):
         
         self.error_count += 1
-        
         error_position = self.file.tell()
-        
         pos = self.last_semicolon_pos
-        
         self.file.seek(pos + 2)
         
         print(self.file.readline().strip())
-        print(" "*(error_position-self.last_semicolon_pos), end = '')
+        print(" "*(error_position-self.last_semicolon_pos-2), end = '')
         print("^")
         
         print("***ERROR:{}".format(error_message))
-
 
 #rough tests
 """names = Names()
@@ -238,9 +238,9 @@ s10=scanner.get_symbol()
 s11=scanner.get_symbol()
 s12=scanner.get_symbol()
 s13=scanner.get_symbol()
-s14=scanner.get_symbol()
+#s14=scanner.get_symbol()
 #s15=scanner.get_symbol()
 #s16=scanner.get_symbol()
 
-print(sym1.type, sym2.type,sym3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type,s14.type)
+print(sym1.type, sym2.type,sym3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
 print(scanner.display_error("eroo0000r"))"""
