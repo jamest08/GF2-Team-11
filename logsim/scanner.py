@@ -60,7 +60,10 @@ class Scanner:
 
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
-        self.names = names
+        self.names=names
+        if len(self.names) != 0:
+            raise ValueError("Names was not an empty list")
+        
         self.symbol_type_list = [self.FULLSTOP, self.SEMICOLON,
         self.KEYWORD, self.NUMBER, self.NAME, self.INVALID] = range(6)
         self.keywords_list = ["define", "connect", "monitor", 
@@ -126,13 +129,17 @@ class Scanner:
     
     def open_file(self,path):
         """Open and return the file specified by path."""
-        try:
-            file =open(self.path, "r")
-        except Exception:
-            print("File could not be opened")
-            sys.exit()
+
+        if type(path) != str:
+            raise TypeError("File path was not a string.")
         else:
-            return(file)
+            try:
+                file =open(self.path, "r")
+            except Exception:
+                print("File could not be opened.")
+                sys.exit()
+            else:
+                return(file)
 
 
     def skip_spaces(self):
