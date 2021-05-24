@@ -10,6 +10,8 @@ Symbol - encapsulates a symbol and stores its properties.
 """
 
 from names import Names
+import sys
+import os
 
 class Symbol:
 
@@ -76,6 +78,7 @@ class Scanner:
         self.path = path
         self.file= self.open_file(self.path)
         self.error_count = 0
+        self.last_semicolon_pos=0
         
 
 
@@ -111,6 +114,8 @@ class Scanner:
             symbol.type = self.SEMICOLON
             symbol.id = self.names.lookup([";"])
             symbol.pos = self.file.tell()
+            self.last_semicolon_pos = self.file.tell()
+            
 
         else: # not a valid character
             symbol.type = self.INVALID
@@ -121,12 +126,18 @@ class Scanner:
     
     def open_file(self,path):
         """Open and return the file specified by path."""
-        file =open(self.path, "r")
-        return(file)
+        try:
+            file =open(self.path, "r")
+        except Exception:
+            print("File could not be opened")
+            sys.exit()
+        else:
+            return(file)
+
 
     def skip_spaces(self):
         
-        z = self.file.read(1)
+        z=self.file.read(1)
         
         while z.isspace()==True:
             z=self.file.read(1)
@@ -144,14 +155,20 @@ class Scanner:
              
                 name.append(z)
                 nextchar=self.file.read(1)
+                prev_char_pos= self.file.tell()
             
                 while nextchar.isalnum()==True:
                     name.append(nextchar)
-                 
+                    prev_char_pos= self.file.tell()
                     nextchar=self.file.read(1)
                 isname=True
                 na=''.join(name)
+
+                self.file.seek(prev_char_pos)
                 return(na)
+                
+                
+                
             
             if z =='':
                 return ''
@@ -183,17 +200,49 @@ class Scanner:
         self.current_character = z
 
     def display_error(self, error_message):
-        print(self.file.readline())
-        print("^")
+        
         self.error_count += 1
+        
+        error_position=self.file.tell()
+        
+        pos = self.last_semicolon_pos
+        
+        self.file.seek(pos + 2)
+        
+        print(self.file.readline().strip())
+        print(" "*(error_position-self.last_semicolon_pos), end='')
+        print("^")
+        
         print("***ERROR:{}".format(error_message))
 
 
-"""#rough tests
-names = Names()
-path= 'C:'+'\\'+'Users'+'\\'+'annam'+'\\'+'Documents'+'\\'+'aauni'+'\\'+'Part2'+'\\'+'GF2'+'\\'+'GF2-Team-11'+'\\'+'logsim'+'\\'+'example.rtf'
+#rough tests
+"""names = Names()
+cwd=(os.getcwd())
+       
+example="Example.txt"
+
+path = cwd + '\\' +example
+
+
 scanner= Scanner(path, names)
 sym1= scanner.get_symbol()
 sym2= scanner.get_symbol()
 sym3= scanner.get_symbol()
-print(sym1, sym2,sym3)"""
+
+s4=scanner.get_symbol()
+s5=scanner.get_symbol()
+s6=scanner.get_symbol()
+s7=scanner.get_symbol()
+s8=scanner.get_symbol()
+s9=scanner.get_symbol()
+s10=scanner.get_symbol()
+s11=scanner.get_symbol()
+s12=scanner.get_symbol()
+s13=scanner.get_symbol()
+s14=scanner.get_symbol()
+#s15=scanner.get_symbol()
+#s16=scanner.get_symbol()
+
+print(sym1.type, sym2.type,sym3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type,s14.type)
+print(scanner.display_error("eroo0000r"))"""
