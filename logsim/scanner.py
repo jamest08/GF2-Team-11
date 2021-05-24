@@ -13,6 +13,7 @@ from names import Names
 import sys
 import os
 
+
 class Symbol:
 
     """Encapsulate a symbol and store its properties.
@@ -28,7 +29,7 @@ class Symbol:
     No public methods.
     """
 
-    def __init__(self,type=None,id=None,pos=None,line=None):
+    def __init__(self, type=None, id=None, pos=None, line=None):
         """Initialise symbol properties."""
         self.type = type
         self.id = id
@@ -60,37 +61,36 @@ class Scanner:
 
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
-        self.names=names
+        self.names = names
         self.symbol_type_list = [self.FULLSTOP, self.SEMICOLON,
         self.KEYWORD, self.NUMBER, self.NAME, self.INVALID] = range(6)
         self.keywords_list = ["define", "connect", "monitor", 
-        "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH", 
-        "state", "NAND", "AND", "OR", "NOR", "inputs", 
-        "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
+          "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH", 
+          "state", "NAND", "AND", "OR", "NOR", "inputs", 
+          "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
         [self.define_ID, self.connect_ID, self.monitor_ID,
-        self.END_ID, self.as_ID, self.XOR_ID, self.DTYPE_ID, 
-        self.CLOCK_ID, self.SWITCH_ID, self.state_ID, 
-        self.NAND_ID,self.AND_ID, self.OR_ID, self.NOR_ID, 
-        self.inputs_ID, self.period_ID, self.to_ID, self.Q_ID, 
-        self.QBAR_ID, self.DATA_ID, self.CLK_ID, self.SET_ID, 
-        self.CLEAR_ID] = self.names.lookup(self.keywords_list)
+          self.END_ID, self.as_ID, self.XOR_ID, self.DTYPE_ID, 
+          self.CLOCK_ID, self.SWITCH_ID, self.state_ID, 
+          self.NAND_ID, self.AND_ID, self.OR_ID, self.NOR_ID, 
+          self.inputs_ID, self.period_ID, self.to_ID, self.Q_ID, 
+          self.QBAR_ID, self.DATA_ID, self.CLK_ID, self.SET_ID, 
+          self.CLEAR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
         self.path = path
-        self.file= self.open_file(self.path)
+        self.file = self.open_file(self.path)
         self.error_count = 0
-        self.last_semicolon_pos=0
-        
+        self.last_semicolon_pos = 0
 
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
-        self.skip_spaces() # current character now not whitespace
+        self.skip_spaces()  # current character now not whitespace
 
         if self.current_character == "#":
             self.skip_comment()
 
-        if self.current_character.isalpha(): # name
+        if self.current_character.isalpha():  # name
             name_string = self.get_name()
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
@@ -99,13 +99,13 @@ class Scanner:
             [symbol.id] = self.names.lookup([name_string])
             symbol.pos = self.file.tell()
 
-        elif self.current_character.isdigit(): # number
+        elif self.current_character.isdigit():  # number
             num = self.get_number()
             symbol.id = self.names.lookup([num])
             symbol.type = self.NUMBER
             symbol.pos = self.file.tell()
 
-        elif self.current_character == ".": # punctuation
+        elif self.current_character == ".":  # punctuation
             symbol.type = self.FULLSTOP
             symbol.id = self.names.lookup(["."])
             symbol.pos = self.file.tell()
@@ -115,36 +115,33 @@ class Scanner:
             symbol.id = self.names.lookup([";"])
             symbol.pos = self.file.tell()
             self.last_semicolon_pos = self.file.tell()
-            
 
-        else: # not a valid character
+        else:  # not a valid character
             symbol.type = self.INVALID
             symbol.pos = self.file.tell()
 
-
         return symbol
-    
-    def open_file(self,path):
+
+    def open_file(self, path):
         """Open and return the file specified by path."""
 
         if type(path) != str:
             raise TypeError("File path was not a string.")
         else:
             try:
-                file =open(self.path, "r")
+                file = open(self.path, "r")
             except Exception:
                 print("File could not be opened.")
                 sys.exit()
             else:
                 return(file)
 
-
     def skip_spaces(self):
         
-        z=self.file.read(1)
+        z = self.file.read(1)
         
-        while z.isspace()==True:
-            z=self.file.read(1)
+        while z.isspace() == True:
+            z = self.file.read(1)
              
         self.current_character = z
     
@@ -158,63 +155,60 @@ class Scanner:
             if z.isalpha() == True:
              
                 name.append(z)
-                nextchar=self.file.read(1)
-                prev_char_pos= self.file.tell()
+                nextchar = self.file.read(1)
+                prev_char_pos = self.file.tell()
             
-                while nextchar.isalnum()==True:
+                while nextchar.isalnum() == True:
                     name.append(nextchar)
-                    prev_char_pos= self.file.tell()
-                    nextchar=self.file.read(1)
-                isname=True
+                    prev_char_pos = self.file.tell()
+                    nextchar = self.file.read(1)
+                isname = True
                 na=''.join(name)
 
                 self.file.seek(prev_char_pos)
                 return(na)
-                
-                
-                
-            
-            if z =='':
+
+            if z == '':
                 return ''
 
     def get_number(self):
-        z= self.current_character
-        number=[]
+        z = self.current_character
+        number = []
 
         if z.isdigit() == True:
              
                 number.append(z)
-                nextnum=self.file.read(1)
+                nextnum = self.file.read(1)
             
-                while nextnum.isdigit()==True:
+                while nextnum.isdigit() == True:
                     number.append(nextnum)
                  
-                    nextnum=self.file.read(1)
+                    nextnum = self.file.read(1)
                 
-                n=''.join(number)
+                n = ''.join(number)
                 return(n)
 
     def skip_comment(self):
         z = self.file.read(1)
         
         while z != "#":
-            z=self.file.read(1)
+            z = self.file.read(1)
 
-        z=self.file.read(1)  
+        z = self.file.read(1)  
         self.current_character = z
 
     def display_error(self, error_message):
         
         self.error_count += 1
         
-        error_position=self.file.tell()
+        error_position = self.file.tell()
         
         pos = self.last_semicolon_pos
         
         self.file.seek(pos + 2)
         
         print(self.file.readline().strip())
-        print(" "*(error_position-self.last_semicolon_pos), end='')
+        print(" "*(error_position-self.last_semicolon_pos), end = '')
         print("^")
         
         print("***ERROR:{}".format(error_message))
@@ -224,7 +218,7 @@ class Scanner:
 """names = Names()
 cwd=(os.getcwd())
        
-example="Example.txt"
+example = "Example.txt"
 
 path = cwd + '\\' +example
 
