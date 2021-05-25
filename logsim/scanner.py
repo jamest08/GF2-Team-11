@@ -217,11 +217,12 @@ class Scanner:
         
         print("***ERROR:{}".format(error_message))
 
+"""
 #rough tests
 names = Names()
 cwd=(os.getcwd())
        
-example = "example2.txt"
+example = "example.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 print(path)
@@ -250,4 +251,8 @@ s13=scanner.get_symbol()
 
 for i in range(150):
     print(scanner.names.get_name_string(scanner.get_symbol().id))
+<<<<<<< HEAD
 #print(scanner.display_error("eroo0000r"))
+=======
+#print(scanner.display_error("eroo0000r"))"""
+>>>>>>> c0358f665cdc5b9c480802dd745e51888ce8c389
