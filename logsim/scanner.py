@@ -105,18 +105,18 @@ class Scanner:
 
         elif self.current_character.isdigit():  # number
             num = self.get_number()
-            symbol.id = self.names.lookup([num])
+            [symbol.id] = self.names.lookup([num])
             symbol.type = self.NUMBER
             symbol.pos = self.file.tell()
 
         elif self.current_character == ".":  # punctuation
             symbol.type = self.FULLSTOP
-            symbol.id = self.names.lookup(["."])
+            [symbol.id] = self.names.lookup(["."])
             symbol.pos = self.file.tell()
 
         elif self.current_character == ";":
             symbol.type = self.SEMICOLON
-            symbol.id = self.names.lookup([";"])
+            [symbol.id] = self.names.lookup([";"])
             symbol.pos = self.file.tell()
             self.last_semicolon_pos = self.file.tell()
 
@@ -215,19 +215,20 @@ class Scanner:
         print("***ERROR:{}".format(error_message))
 
 #rough tests
-"""names = Names()
+names = Names()
 cwd=(os.getcwd())
        
-example = "Example.txt"
-
+example = "example2.txt"
+#path = cwd + '/' + example
 path = cwd + '\\' +example
+print(path)
 
 
 scanner= Scanner(path, names)
-sym1= scanner.get_symbol()
-sym2= scanner.get_symbol()
-sym3= scanner.get_symbol()
-
+"""
+s1= scanner.get_symbol()
+s2= scanner.get_symbol()
+s3= scanner.get_symbol()
 s4=scanner.get_symbol()
 s5=scanner.get_symbol()
 s6=scanner.get_symbol()
@@ -242,5 +243,8 @@ s13=scanner.get_symbol()
 #s15=scanner.get_symbol()
 #s16=scanner.get_symbol()
 
-print(sym1.type, sym2.type,sym3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
-print(scanner.display_error("eroo0000r"))"""
+print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
+"""
+for i in range(150):
+    print(scanner.names.get_name_string(scanner.get_symbol().id))
+#print(scanner.display_error("eroo0000r"))
