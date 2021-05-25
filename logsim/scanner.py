@@ -90,9 +90,9 @@ class Scanner:
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
-
         if self.current_character == "#":
             self.skip_comment()
+            self.skip_spaces()
 
         if self.current_character.isalpha():  # name
             name_string = self.get_name()
@@ -218,9 +218,9 @@ class Scanner:
 names = Names()
 cwd=(os.getcwd())
        
-example = "example2.txt"
-#path = cwd + '/' + example
-path = cwd + '\\' +example
+example = "example3.txt"
+path = cwd + '/' + example
+#path = cwd + '\\' +example
 print(path)
 
 
