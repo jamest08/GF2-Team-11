@@ -60,36 +60,55 @@ class Parser:
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id == self.names.query('END'):
                 break
+
             elif self.current_symbol.id == self.names.query('define'):
                 self.current_symbol = self.scanner.get_symbol()
-                self.name()
+                if not self.name():
+                    continue
                 #call to devices, check name not already in use
-                while True:
-                    self.current_symbol = self.scanner.get_symbol()
-                    if self.current_symbol.id == self.names.query('as'): #may need changing
+                self.current_symbol = self.scanner.get_symbol()
+                need_continue = False
+                while self.current_symbol.id != self.names.query('as'):
+                    if not self.name():
+                        need_continue = True
                         break
-                    self.name()
+                    else:
+                        self.current_symbol = self.scanner.get_symbol()
                     #call to devices, check name not already in use
+                if need_continue:
+                    continue
                 self.current_symbol = self.scanner.get_symbol()
-                self.device()
+                if not self.device():
+                    continue
                 self.current_symbol = self.scanner.get_symbol()
+
             elif self.current_symbol.id == self.names.query('connect'):
                 self.current_symbol = self.scanner.get_symbol()
-                self.output()
+                if not self.output():
+                    continue
                 if self.current_symbol.id != self.names.query('to'):
                     self.scanner.display_error("Expected keyword 'to'")
                     continue
                 self.current_symbol = self.scanner.get_symbol()
-                self.input()
+                if not self.input():
+                    continue
                 self.current_symbol = self.scanner.get_symbol()
+
             elif self.current_symbol.id == self.names.query('monitor'):
                 self.current_symbol = self.scanner.get_symbol()
+                need_continue = False
                 while self.current_symbol.id != self.names.query(';'):
-                    self.output()
+                    if not self.output():
+                        need_continue = True
+                        break
+                if need_continue:
+                    continue
                     #call monitors class
+
             elif self.current_symbol.type == self.scanner.EOF:
                 self.scanner.display_error('Expected END at EOF')
                 break
+
             else: #unexpected symbol
                 self.scanner.display_error('Invalid symbol')
                 continue
@@ -97,22 +116,27 @@ class Parser:
             if self.current_symbol.id != self.names.query(';'): #do this at end of all lines - may need to move this depending on where scanner.error() leave pointer
                 self.scanner.display_error('Expected semicolon')
 
-        print(str(scanner.error_count) + ' syntax errors were found.')
+        print('Number of syntax errors found: ' + str(scanner.error_count))
         return True
 
     def name(self):
         if self.current_symbol.type != self.scanner.NAME:
-            raise NameError('Invalid name, may be keyword')
+            self.scanner.display_error('Invalid name, may be keyword')
+            return False
+        else:
+            return True
 
     def device(self):
         if self.current_symbol.id == self.names.query('SWITCH'):
             self.current_symbol = self.scanner.get_symbol()
             switch_state_id = self.current_symbol.id
             if switch_state_id not in [self.names.query('0'), self.names.query('1')]:
-                raise SyntaxError("Expected 0 or 1 for switch state") #replace this with a call to syntax error method of scanner class, move to semicolon
+                self.scanner.display_error("Expected 0 or 1 for switch state")
+                return False
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id != self.names.query('state'):
-                raise SyntaxError("Expected keyword 'state'")
+                self.scanner.display_error("Expected keyword 'state'")
+                return False
         elif self.current_symbol.id in [self.names.query('NAND'), self.names.query('AND'), self.names.query('OR'), self.names.query('NOR')]:
             gate_id = self.current_symbol.id
             self.current_symbol = self.scanner.get_symbol()
@@ -120,11 +144,13 @@ class Parser:
             #check semantic error: invalid qualifier
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id != self.names.query('inputs'):
-                raise SyntaxError("Expected keyword 'inputs'")
+                self.scanner.display_error("Expected keyword 'inputs'")
+                return False
         elif self.current_symbol.id == self.names.query('CLOCK'):
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id != self.names.query('period'):
-                raise SyntaxError("Expected keyword 'period'")
+                self.scanner.display_error("Expected keyword 'period'")
+                return False
             self.current_symbol = self.scanner.get_symbol()
             clock_period_id = self.current_symbol.id
             #check semantic error: clock period is number, doesn't start with zero
@@ -135,11 +161,14 @@ class Parser:
             #call to devices
             pass
         else:
-            raise SyntaxError('expected device type') #replace this with a call to syntax error method of scanner class, move to semicolon
+            self.scanner.display_error('Expected device type')
+            return False
+        return True
 
     def output(self):
         name_id = self.current_symbol.id
-        self.name() #check actually a name
+        if not self.name(): #check actually a name
+            return False
         self.current_symbol = self.scanner.get_symbol()
         if self.current_symbol.id == self.names.query('.'):
             #check name corresponds to DTYPE
@@ -147,12 +176,14 @@ class Parser:
             if self.current_symbol.id not in [self.names.query('Q'), self.names.query('QBAR')]:
                 raise SyntaxError('Expected Q or QBAR to follow .')
             self.current_symbol = self.scanner.get_symbol()
+        return True
         #return output name/port to be called by network/monitor. current symbol is symbol after output
 
 
     def input(self):
         name_id = self.current_symbol.id
-        self.name() #check actually a name
+        if not self.name(): #check actually a name
+            return False
         self.current_symbol = self.scanner.get_symbol()
         if self.current_symbol.id != self.names.query('.'):
             raise SyntaxError("Expected '.' before input port")
@@ -165,6 +196,7 @@ class Parser:
             #check received valid input number. check for port_absent
         else:
             raise SyntaxError('Expected port')
+        return True
         #return input name/port to be called by network. current symbol is last symbol of input (different from input function)
 
 

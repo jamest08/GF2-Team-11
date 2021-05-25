@@ -131,6 +131,7 @@ class Scanner:
 
         else:  # not a valid character
             symbol.type = self.INVALID
+            [symbol.id] = self.names.lookup([self.current_character])
             symbol.pos = self.file.tell()
 
         return symbol
@@ -235,6 +236,7 @@ class Scanner:
         print('\n')
 
         if error_message == 'Expected semicolon':
+            print(self.current_character)
             self.last_semicolon_pos = self.file.tell()
 
 
