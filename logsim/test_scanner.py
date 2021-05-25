@@ -14,7 +14,7 @@ def scanner_one():
 
     # Print the path provided and try to open the file for reading
     cwd = os.getcwd()
-    example = "example.txt"
+    example = "example1.txt"
 
     path = "{}/{}".format(cwd, example)
     print(path)
@@ -64,7 +64,7 @@ def test_innit_raises_exceptions():
         scanner = Scanner(12, names)
 
     cwd = os.getcwd()
-    example = "example.txt"
+    example = "example1.txt"
     new_path = "{}/{}".format(cwd, example)
     print(new_path)
 
@@ -112,6 +112,12 @@ def test_get_symbol_example_one(scanner_one):
 
     assert symbol.type == scanner.KEYWORD
     assert symbol.id == scanner.END_ID
+
+    # check get_symbol returns "" if at the end of the file
+
+    symbol = scanner.get_symbol()
+
+    assert symbol.type == scanner.EOF
 
 
 def test_get_symbol_example_two(scanner_two):
@@ -163,3 +169,31 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
 
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
+
+
+def test_display_error_raises_exceptions(scanner_one):
+    """Check if the display error function is raising exceptions"""
+
+    scanner = scanner_one
+
+    with pytest.raises(TypeError):
+        var = scanner_one.display_error(12)
+
+
+def test_display_error(scanner_one):
+    """Check if the display error function is producing the expected output"""
+
+    """ Will check if print statements are appropriate from manual testing,
+    since the function does not output any information about the print"""
+
+    # check if next read position is on next line after an error is flagged
+
+    scanner = scanner_one
+
+    for i in range(3):
+        symbol = scanner.get_symbol()
+
+    scanner.display_error("error_message")
+
+    symbol = scanner.get_symbol()  # expecting this symbol to be 'define'
+    assert symbol.id == scanner.define_ID
