@@ -159,8 +159,9 @@ class Scanner:
             if z.isalpha() == True:
              
                 name.append(z)
-                nextchar = self.file.read(1)
                 prev_char_pos = self.file.tell()
+                nextchar = self.file.read(1)
+                
             
                 while nextchar.isalnum() == True:
                     name.append(nextchar)
@@ -227,7 +228,7 @@ print(path)
 
 
 scanner= Scanner(path, names)
-"""
+
 s1= scanner.get_symbol()
 s2= scanner.get_symbol()
 s3= scanner.get_symbol()
@@ -245,8 +246,8 @@ s13=scanner.get_symbol()
 #s15=scanner.get_symbol()
 #s16=scanner.get_symbol()
 
-print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
+#print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
 
 for i in range(150):
     print(scanner.names.get_name_string(scanner.get_symbol().id))
-#print(scanner.display_error("eroo0000r"))"""
+#print(scanner.display_error("eroo0000r"))
