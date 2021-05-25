@@ -143,7 +143,7 @@ class Parser:
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id not in [self.names.query('Q'), self.names.query('QBAR')]:
                 raise SyntaxError('Expected Q or QBAR to follow .')
-            self.current_symbol == self.scanner.get_symbol()
+            self.current_symbol = self.scanner.get_symbol()
         #return output name/port to be called by network/monitor. current symbol is symbol after output
 
 
@@ -171,7 +171,7 @@ class Parser:
 names = Names()
 cwd=(os.getcwd())
        
-example = "example2.txt"
+example = "example3.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 print(path)
