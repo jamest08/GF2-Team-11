@@ -84,6 +84,7 @@ class Scanner:
         self.file = self.open_file(self.path)
         self.error_count = 0
         self.last_semicolon_pos = 0
+        self.last_comment_pos = 0
 
 
     def get_symbol(self):
@@ -200,16 +201,23 @@ class Scanner:
         
         while z != "#":
             z = self.file.read(1)
-
+        
         z = self.file.read(1)  
+        self.last_comment_pos = self.file.tell()
         self.current_character = z
 
     def display_error(self, error_message):
         
         self.error_count += 1
         error_position = self.file.tell()
-        pos = self.last_semicolon_pos
-        self.file.seek(pos + 2)
+        
+        if self.last_semicolon_pos > self.last_comment_pos:
+            pos = self.last_semicolon_pos
+        else:
+            pos = self.last_comment_pos
+
+        self.file.seek(pos+2)
+        
         
         print(self.file.readline().strip())
         print(" "*(error_position-self.last_semicolon_pos-2), end = '')
@@ -222,7 +230,7 @@ class Scanner:
 names = Names()
 cwd=(os.getcwd())
        
-example = "example2.txt"
+example = "example.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 print(path)
@@ -251,6 +259,4 @@ s13=scanner.get_symbol()
 
 for i in range(150):
     print(scanner.names.get_name_string(scanner.get_symbol().id))
-#print(scanner.display_error("eroo0000r"))
-"""
-
+print(scanner.display_error("eroo0000r"))"""
