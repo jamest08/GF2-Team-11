@@ -216,18 +216,19 @@ class Scanner:
         
         print("***ERROR:{}".format(error_message))
 
+"""
 #rough tests
 names = Names()
 cwd=(os.getcwd())
        
-example = "example2.txt"
+example = "example.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 print(path)
 
 
 scanner= Scanner(path, names)
-"""
+
 s1= scanner.get_symbol()
 s2= scanner.get_symbol()
 s3= scanner.get_symbol()
