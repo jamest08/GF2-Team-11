@@ -217,19 +217,19 @@ class Scanner:
         
         print("***ERROR:{}".format(error_message))
 
-"""
+
 #rough tests
 names = Names()
 cwd=(os.getcwd())
        
-example = "example.txt"
+example = "example2.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 print(path)
 
 
 scanner= Scanner(path, names)
-
+"""
 s1= scanner.get_symbol()
 s2= scanner.get_symbol()
 s3= scanner.get_symbol()
@@ -248,11 +248,8 @@ s13=scanner.get_symbol()
 #s16=scanner.get_symbol()
 
 #print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
-
+"""
 for i in range(150):
     print(scanner.names.get_name_string(scanner.get_symbol().id))
-<<<<<<< HEAD
 #print(scanner.display_error("eroo0000r"))
-=======
-#print(scanner.display_error("eroo0000r"))"""
->>>>>>> c0358f665cdc5b9c480802dd745e51888ce8c389
+
