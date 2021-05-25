@@ -71,11 +71,11 @@ class Scanner:
             raise TypeError("names arguments not an instance of Names class")
 
         self.symbol_type_list = [self.FULLSTOP, self.SEMICOLON,
-            self.KEYWORD, self.NUMBER, self.NAME, self.INVALID] = range(6)
-        self.keywords_list = ["define", "connect", "monitor",
-            "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH",
-            "state", "NAND", "AND", "OR", "NOR", "inputs",
-            "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
+        self.KEYWORD, self.NUMBER, self.NAME, self.INVALID, self.EOF] = range(7)
+        self.keywords_list = ["define", "connect", "monitor", 
+          "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH", 
+          "state", "NAND", "AND", "OR", "NOR", "inputs", 
+          "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
         [self.define_ID, self.connect_ID, self.monitor_ID,
             self.END_ID, self.as_ID, self.XOR_ID, self.DTYPE_ID,
             self.CLOCK_ID, self.SWITCH_ID, self.state_ID,
@@ -123,6 +123,11 @@ class Scanner:
             [symbol.id] = self.names.lookup([";"])
             symbol.pos = self.file.tell()
             self.last_semicolon_pos = self.file.tell()
+
+        elif self.current_character == "":
+            symbol.type = self.EOF
+            [symbol.id] = self.names.lookup([""])
+            symbol.pos = self.file.tell()
 
         else:  # not a valid character
             symbol.type = self.INVALID
@@ -227,6 +232,10 @@ class Scanner:
         print("^")
 
         print("***ERROR:{}".format(error_message))
+        print('\n')
+
+        if error_message == 'Expected semicolon':
+            self.last_semicolon_pos = self.file.tell()
 
 
 """
@@ -258,6 +267,8 @@ s13=scanner.get_symbol()
 #s14=scanner.get_symbol()
 #s15=scanner.get_symbol()
 #s16=scanner.get_symbol()
+
+#print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
 
 for i in range(150):
     print(scanner.names.get_name_string(scanner.get_symbol().id))

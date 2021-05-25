@@ -58,7 +58,7 @@ class Parser:
         while True:
             #these are all possibilities for start of line (ie. just after semicolon)
             self.current_symbol = self.scanner.get_symbol()
-            if self.current_symbol.id ==  self.names.query('END'):
+            if self.current_symbol.id == self.names.query('END'):
                 break
             elif self.current_symbol.id == self.names.query('define'):
                 self.current_symbol = self.scanner.get_symbol()
@@ -77,7 +77,8 @@ class Parser:
                 self.current_symbol = self.scanner.get_symbol()
                 self.output()
                 if self.current_symbol.id != self.names.query('to'):
-                    raise SyntaxError("Expected keyword 'to'")
+                    self.scanner.display_error("Expected keyword 'to'")
+                    continue
                 self.current_symbol = self.scanner.get_symbol()
                 self.input()
                 self.current_symbol = self.scanner.get_symbol()
@@ -86,15 +87,17 @@ class Parser:
                 while self.current_symbol.id != self.names.query(';'):
                     self.output()
                     #call monitors class
-            elif self.current_symbol.id == self.names.query(""):
-                raise SyntaxError('Expected END at EOF') #replace this with a call to syntax error method of scanner class
+            elif self.current_symbol.type == self.scanner.EOF:
+                self.scanner.display_error('Expected END at EOF')
                 break
             else: #unexpected symbol
-                raise SyntaxError('Invalid symbol') #replace this with a call to syntax error method of scanner class, move to semicolon
+                self.scanner.display_error('Invalid symbol')
+                continue
 
             if self.current_symbol.id != self.names.query(';'): #do this at end of all lines - may need to move this depending on where scanner.error() leave pointer
-                raise SyntaxError('Expected semicolon') #replace this with a call to syntax error method of scanner class, move to semicolon
+                self.scanner.display_error('Expected semicolon')
 
+        print(str(scanner.error_count) + ' syntax errors were found.')
         return True
 
     def name(self):
@@ -171,11 +174,9 @@ class Parser:
 names = Names()
 cwd=(os.getcwd())
        
-example = "example3.txt"
+example = "example1_with_syntax_errors.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
-print(path)
-
 
 scanner= Scanner(path, names)
 devices = Devices(names)
