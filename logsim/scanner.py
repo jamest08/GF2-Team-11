@@ -182,14 +182,16 @@ class Scanner:
         if z.isdigit() == True:
              
                 number.append(z)
+                prev_char_pos = self.file.tell()
                 nextnum = self.file.read(1)
-            
+                
                 while nextnum.isdigit() == True:
                     number.append(nextnum)
-                 
+                    prev_char_pos = self.file.tell()
                     nextnum = self.file.read(1)
                 
                 n = ''.join(number)
+                self.file.seek(prev_char_pos)
                 return(n)
 
     def skip_comment(self):
@@ -218,7 +220,7 @@ class Scanner:
 names = Names()
 cwd=(os.getcwd())
        
-example = "example3.txt"
+example = "example2.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 print(path)
@@ -244,7 +246,7 @@ s13=scanner.get_symbol()
 #s16=scanner.get_symbol()
 
 print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
-"""
+
 for i in range(150):
     print(scanner.names.get_name_string(scanner.get_symbol().id))
-#print(scanner.display_error("eroo0000r"))
+#print(scanner.display_error("eroo0000r"))"""
