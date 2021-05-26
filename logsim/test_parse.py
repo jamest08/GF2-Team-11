@@ -21,24 +21,33 @@ from parse import Parser
 ])
 
 @pytest.fixture
-def parser(example):
-    """Return an instance of a scanner using ."""
+def file_list():
+    return["example1.txt", "example1_with_syntax_errors.txt", "example2_with_syntax_errors.txt", "example3.txt", "example4.txt"]
+
+"""@pytest.fixture
+def parser():
+    Return an instance of a scanner using .
     print("\nNow opening file...")
 
     # Print the path provided and try to open the file for reading
     cwd = os.getcwd()
     #example = "Example.txt"
-    for file in example:
+    file_list: ["example1.txt", "example1_with_syntax_errors.txt", "example2_with_syntax_errors.txt", "example3.txt", "example4.txt"]
+    parser_list = []
+
+    for i in file_list():
         path = cwd + '//' + example
-    print(path)
-    
-    names = Names()
-    scanner= Scanner(path, names)
-    devices = Devices(names)
-    network = Network(names, devices)
-    monitors = Monitors(names, devices, network)
-    parser = Parser(names, devices, network, monitors, scanner)
-    return parser1,
+        print(path)
+        names = Names()
+        scanner= Scanner(path, names)
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        parser = Parser(names, devices, network, monitors, scanner)
+        parser_list.append(parser)
+
+    return parser_list"""
+
 
 
 

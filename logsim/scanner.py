@@ -216,7 +216,7 @@ class Scanner:
         self.last_comment_pos = self.file.tell()
         self.current_character = z
 
-    def display_error(self, error_message):
+    def display_error(self, error_message,caret=True):
         """Display line of error and the error_message."""
         self.error_count += 1
         error_position = self.file.tell()
@@ -234,11 +234,15 @@ class Scanner:
         if type(error_message) != str:
             raise TypeError("Error message not a string")
         else:
-            print(self.file.readline().strip())
-            print(" "*(error_position-self.last_semicolon_pos-4), end='')
-            print("^")
-            print("***ERROR:{}".format(error_message))
-            print('\n')
+            if caret is True:
+                print(self.file.readline().strip())
+                print(" "*(error_position-self.last_semicolon_pos-4), end='')
+                print("^")
+                print("***ERROR:{}".format(error_message))
+                print('\n')
+            else:
+                print("***ERROR:{}".format(error_message))
+                print('\n')
 
         if error_message == 'Expected semicolon':
             print(self.current_character)
@@ -250,9 +254,9 @@ class Scanner:
 names = Names()
 cwd=(os.getcwd())
 
-example = "example.txt"
-path = cwd + '/' + example
-#path = cwd + '\\' +example
+example = "example2.txt"
+#path = cwd + '/' + example
+path = cwd + '\\' +example
 print(path)
 
 
@@ -274,9 +278,9 @@ s13=scanner.get_symbol()
 #s14=scanner.get_symbol()
 #s15=scanner.get_symbol()
 #s16=scanner.get_symbol()
-
+#print(scanner.display_error("eroo0000r"))
 #print(s1.type, s2.type,s3.type,s4.type,s5.type,s6.type,s7.type,s8.type,s9.type,s10.type,s11.type,s12.type,s13.type)
 
 for i in range(150):
-    print(scanner.names.get_name_string(scanner.get_symbol().id))
-print(scanner.display_error("eroo0000r"))"""
+    print(scanner.names.get_name_string(scanner.get_symbol().id))"""
+
