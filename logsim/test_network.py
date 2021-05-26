@@ -105,14 +105,14 @@ def test_check_network(network_with_devices):
                                                      "I2"])
 
     # Inputs are unconnected, check_network() should return False
-    assert not network.check_network()
+    assert len(network.check_network()) > 0 #CHANGED TO MATCH NEW CHECK_NETWORK
 
     # Make connections
     network.make_connection(SW1_ID, None, OR1_ID, I1)
     network.make_connection(SW2_ID, None, OR1_ID, I2)
 
     # Inputs are now connected, check_network() should return True
-    assert network.check_network()
+    assert len(network.check_network()) == 0
 
 
 def test_make_connection(network_with_devices):
