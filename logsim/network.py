@@ -156,13 +156,14 @@ class Network:
         return error_type
 
     def check_network(self):
-        """Return True if all inputs in the network are connected."""
+        """Return list of floating inputs."""
+        floating_inputs = []
         for device_id in self.devices.find_devices():
             device = self.devices.get_device(device_id)
             for input_id in device.inputs:
                 if self.get_connected_output(device_id, input_id) is None:
-                    return False
-        return True
+                    floating_inputs.append([device_id, input_id])
+        return floating_inputs
 
     def update_signal(self, signal, target):
         """Update the signal in the direction of the target.

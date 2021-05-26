@@ -1,4 +1,4 @@
-define CL1 as CLOCK period 1;
+define CL1 as CLOCK period 2;
 define SW1 as SWITCH 1 state;
 define SW2 as SWITCH 0 state;
 define D1 D2 D3 as DTYPE;
@@ -15,6 +15,5 @@ connect D1.QBAR to D1.DATA;
 connect D2.QBAR to D2.DATA;
 connect D3.QBAR to D3.DATA;
 monitor D1.Q D2.Q D3.Q;
-define C496 as CLOCK period 4002;
 END
 
