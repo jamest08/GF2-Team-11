@@ -17,6 +17,7 @@ from monitors import Monitors
 import sys
 import os
 
+
 class Parser:
 
     """Parse the definition file and build the logic network.
@@ -49,14 +50,13 @@ class Parser:
         self.scanner = scanner
         self.current_symbol = ""
 
-    #check all listed semantic errors included
     def parse_network(self):
         """Parse the circuit definition file."""
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
         while True:
-            #these are all possibilities for start of line (ie. just after semicolon)
+            # these are all possibilities for start of line
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id == self.names.query('END'):
                 break
@@ -64,10 +64,10 @@ class Parser:
             elif self.current_symbol.id == self.names.query('define'):
                 name_ids = []
                 self.current_symbol = self.scanner.get_symbol()
-                if not self.name(): #check valid name
+                if not self.name():  # check valid name
                     continue
                 name_ids.append(self.current_symbol.id)
-                #call to devices, check name not already in use
+                # call to devices, check name not already in use
                 self.current_symbol = self.scanner.get_symbol()
                 need_continue = False
                 while self.current_symbol.id != self.names.query('as'):
@@ -77,7 +77,7 @@ class Parser:
                     else:
                         name_ids.append(self.current_symbol.id)
                         self.current_symbol = self.scanner.get_symbol()
-                    #call to devices, check name not already in use
+                    # call to devices, check name not already in use
                 if need_continue:
                     continue
                 self.current_symbol = self.scanner.get_symbol()
@@ -88,18 +88,19 @@ class Parser:
             elif self.current_symbol.id == self.names.query('connect'):
                 self.current_symbol = self.scanner.get_symbol()
                 [output_id, output_port_id] = self.output()
-                if output_id == None:
+                if output_id is None:
                     continue
                 if self.current_symbol.id != self.names.query('to'):
                     self.scanner.display_error("Expected keyword 'to'")
                     continue
                 self.current_symbol = self.scanner.get_symbol()
                 [input_id, input_port_id] = self.input()
-                if input_id == None:
+                if input_id is None:
                     continue
-                #check semantic errors
+                # check semantic errors
                 if self.scanner.error_count == 0:
-                    error_type = self.network.make_connection(output_id, output_port_id, input_id, input_port_id)
+                    error_type = self.network.make_connection(output_id, output_port_id,
+                                                              input_id, input_port_id)
                     if error_type == self.network.INPUT_CONNECTED:
                         self.scanner.display_error("Input is already in a connection")
                         continue
@@ -110,7 +111,7 @@ class Parser:
                 need_continue = False
                 while self.current_symbol.id != self.names.query(';'):
                     [output_id, output_port_id] = self.output()
-                    if output_id == None:
+                    if output_id is None:
                         need_continue = True
                         break
                     if self.scanner.error_count == 0:
@@ -126,26 +127,29 @@ class Parser:
                 self.scanner.display_error('Expected END at EOF')
                 break
 
-            else: #unexpected symbol
+            else:  # unexpected symbol
                 self.scanner.display_error('Invalid symbol')
                 continue
 
-            if self.current_symbol.id != self.names.query(';'): #do this at end of all lines - may need to move this depending on where scanner.error() leave pointer
+            # do this at end of all lines
+            if self.current_symbol.id != self.names.query(';'):
                 self.scanner.display_error('Expected semicolon')
 
-        #check all inputs connected
+        # check all inputs connected
         floating_inputs = self.network.check_network()
         if len(floating_inputs) != 0:
             floating_inputs_list = []
             for floating_input in floating_inputs:
-                floating_inputs_list.append(self.names.get_name_string(floating_input[0]) + '.' + self.names.get_name_string(floating_input[1]))
+                floating_inputs_list.append(self.names.get_name_string(floating_input[0])
+                                            + '.' + self.names.get_name_string(floating_input[1]))
             self.scanner.display_error("The following inputs are floating: " + str(floating_inputs_list))
 
-        #check at least one monitor
+        # check at least one monitor
         if len(self.monitors.monitors_dictionary) == 0:
             print("Warning: No monitors specified.")
 
-        print('Number of errors found: ' + str(self.scanner.error_count)) #cmay not pick up all semantic errors as stops calling network
+        # may not pick up all semantic errors as stops calling network
+        print('Number of errors found: ' + str(self.scanner.error_count))
         if self.scanner.error_count == 0:
             return True
         else:
@@ -174,9 +178,10 @@ class Parser:
                 return False
             for name_id in name_ids:
                 self.devices.make_device(name_id, self.devices.SWITCH, switch_state)
-                #errors all covered by syntax
+                # errors all covered by syntax
 
-        elif self.current_symbol.id in [self.names.query('NAND'), self.names.query('AND'), self.names.query('OR'), self.names.query('NOR')]:
+        elif self.current_symbol.id in [self.names.query('NAND'), self.names.query('AND'),
+                                        self.names.query('OR'), self.names.query('NOR')]:
             gate_id = self.current_symbol.id
             self.current_symbol = self.scanner.get_symbol()
             num_inputs = int(self.names.get_name_string(self.current_symbol.id))
@@ -198,7 +203,8 @@ class Parser:
                 return False
             self.current_symbol = self.scanner.get_symbol()
             try:
-                clock_period = int(self.names.get_name_string(self.current_symbol.id)) #zeros at start will be truncated
+                # zeros at start will be truncated
+                clock_period = int(self.names.get_name_string(self.current_symbol.id))
             except ValueError:
                 self.scanner.display_error("Expected integer period.")
                 return False
@@ -227,7 +233,7 @@ class Parser:
 
     def output(self):
         name_id = self.current_symbol.id
-        if self.devices.get_device(name_id) == None: #check actually a device
+        if self.devices.get_device(name_id) is None:  # check actually a device
             self.scanner.display_error('Output device does not exist.')
             return [None, None]
         self.current_symbol = self.scanner.get_symbol()
@@ -248,12 +254,11 @@ class Parser:
                 return [None, None]
             port_id = None
         return [name_id, port_id]
-        #current symbol is symbol after output
-
+        # current symbol is symbol after output
 
     def input(self):
         name_id = self.current_symbol.id
-        if self.devices.get_device(name_id) == None: #check actually a device
+        if self.devices.get_device(name_id) is None:  # check actually a device
             self.scanner.display_error('Input device does not exist.')
             return [None, None]
         self.current_symbol = self.scanner.get_symbol()
@@ -261,14 +266,19 @@ class Parser:
             self.scanner.display_error("Expected '.' before input port")
             return [None, None]
         self.current_symbol = self.scanner.get_symbol()
-        if self.current_symbol.id in [self.names.query('DATA'), self.names.query('SET'), self.names.query('CLK'), self.names.query('CLEAR')]:
+        if self.current_symbol.id in [self.names.query('DATA'), self.names.query('SET'),
+                                      self.names.query('CLK'), self.names.query('CLEAR')]:
             if self.devices.get_device(name_id).device_kind != self.devices.D_TYPE:
                 self.scanner.display_error("DTYPE port specified for non-DTYPE device.")
                 return [None, None]
             port_id = self.current_symbol.id
-        elif self.current_symbol.id in self.names.lookup(['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10', 'I11', 'I12', 'I13', 'I14', 'I15', 'I16']):
-            if self.devices.get_device(name_id).device_kind not in [self.devices.AND, self.devices.NAND, self.devices.OR, self.devices.NOR]:
-                self.scanner.display_error("Invalid input port type for " + self.names.get_name_string(self.devices.get_device(name_id).device_kind))
+        elif self.current_symbol.id in self.names.lookup(['I1', 'I2', 'I3', 'I4', 'I5', 'I6',
+                                                          'I7', 'I8', 'I9', 'I10', 'I11', 'I12',
+                                                          'I13', 'I14', 'I15', 'I16']):
+            if self.devices.get_device(name_id).device_kind not in [self.devices.AND, self.devices.NAND,
+                                                                    self.devices.OR, self.devices.NOR]:
+                self.scanner.display_error("Invalid input port type for "
+                                            + self.names.get_name_string(self.devices.get_device(name_id).device_kind))
                 return [None, None]
             if self.current_symbol.id not in self.devices.get_device(name_id).inputs:
                 self.scanner.display_error("Specified input port out of range")
@@ -278,12 +288,13 @@ class Parser:
             self.scanner.display_error('Expected port')
             return [None, None]
         return [name_id, port_id]
-        #current symbol is last symbol of input (different from output function)
+        # current symbol is last symbol of input (different from output function)
+
 """
 #quick tests
 names = Names()
 cwd=(os.getcwd())
-       
+
 example = "example2.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
