@@ -226,10 +226,13 @@ class Scanner:
         else:
             pos = self.last_comment_pos
 
-        self.file.seek(pos+2)
+        if pos == 0:
+            self.file.seek(pos)
+        else:
+            self.file.seek(pos+2)
 
         print(self.file.readline().strip())
-        print(" "*(error_position-self.last_semicolon_pos-2), end='')
+        print(" "*(error_position-self.last_semicolon_pos-4), end='')
         print("^")
 
         print("***ERROR:{}".format(error_message))
