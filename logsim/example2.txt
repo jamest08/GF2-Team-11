@@ -1,5 +1,5 @@
 define CL1 as CLOCK period 2;
-define SW1 as SWITCH 1 state;
+define SW1 as SWITCH 0 state;
 define SW2 as SWITCH 0 state;
 define D1 D2 D3 as DTYPE;
 connect SW1 to D1.SET;

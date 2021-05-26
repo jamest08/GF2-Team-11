@@ -279,10 +279,7 @@ class Parser:
             return [None, None]
         return [name_id, port_id]
         #current symbol is last symbol of input (different from output function)
-
-
-#pad out functions etc. then include calls to Devices and Network with semantic error detection
-
+"""
 #quick tests
 names = Names()
 cwd=(os.getcwd())
@@ -307,3 +304,4 @@ for device_id in device_ids:
                 print('Input ' + names.get_name_string(input_id) + ' connected to', names.get_name_string(output[0]))
                 if output[1] != None:
                     print('Output port ' + names.get_name_string(output[1]))
+"""
