@@ -231,12 +231,14 @@ class Scanner:
         else:
             self.file.seek(pos+2)
 
-        print(self.file.readline().strip())
-        print(" "*(error_position-self.last_semicolon_pos-4), end='')
-        print("^")
-
-        print("***ERROR:{}".format(error_message))
-        print('\n')
+        if type(error_message) != str:
+            raise TypeError("Error message not a string")
+        else:
+            print(self.file.readline().strip())
+            print(" "*(error_position-self.last_semicolon_pos-4), end='')
+            print("^")
+            print("***ERROR:{}".format(error_message))
+            print('\n')
 
         if error_message == 'Expected semicolon':
             print(self.current_character)
