@@ -176,9 +176,10 @@ class Parser:
             if self.current_symbol.id != self.names.query('state'):
                 self.scanner.display_error("Expected keyword 'state'")
                 return False
-            for name_id in name_ids:
-                self.devices.make_device(name_id, self.devices.SWITCH, switch_state)
-                # errors all covered by syntax
+            if self.scanner.error_count == 0:
+                for name_id in name_ids:
+                    self.devices.make_device(name_id, self.devices.SWITCH, switch_state)
+                    # errors all covered by syntax
 
         elif self.current_symbol.id in [self.names.query('NAND'), self.names.query('AND'),
                                         self.names.query('OR'), self.names.query('NOR')]:
@@ -212,7 +213,7 @@ class Parser:
                 for name_id in name_ids:
                     error_type = self.devices.make_device(name_id, self.devices.CLOCK, clock_period//2)
                     if error_type == self.devices.INVALID_QUALIFIER:
-                        self.scanner.display_error("Expected half period > 0")
+                        self.scanner.display_error("Expected half period >= 1 simulation cycle")
                         return False
 
         elif self.current_symbol.id == self.names.query('DTYPE'):
@@ -276,7 +277,7 @@ class Parser:
                                                           'I7', 'I8', 'I9', 'I10', 'I11', 'I12',
                                                           'I13', 'I14', 'I15', 'I16']):
             if self.devices.get_device(name_id).device_kind not in [self.devices.AND, self.devices.NAND,
-                                                                    self.devices.OR, self.devices.NOR]:
+                                                                    self.devices.OR, self.devices.NOR, self.devices.XOR]:
                 self.scanner.display_error("Invalid input port type for "
                                             + self.names.get_name_string(self.devices.get_device(name_id).device_kind))
                 return [None, None]
@@ -295,7 +296,7 @@ class Parser:
 names = Names()
 cwd=(os.getcwd())
 
-example = "example2.txt"
+example = "example4.txt"
 path = cwd + '/' + example
 #path = cwd + '\\' +example
 
