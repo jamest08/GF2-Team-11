@@ -243,7 +243,7 @@ class Scanner:
         if type(error_message) != str:
             raise TypeError("Error message not a string")
         else:
-            if caret is True:
+            if caret:
                 print(self.file.readline().strip())
                 print(" "*(difference-3), end='')
                 print("^")
