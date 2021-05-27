@@ -124,11 +124,11 @@ class Parser:
                     continue
 
             elif self.current_symbol.type == self.scanner.EOF:
-                self.scanner.display_error('Expected END at EOF')
+                self.scanner.display_error('Expected END at end of file', False)
                 break
 
             else:  # unexpected symbol
-                self.scanner.display_error('Invalid symbol')
+                self.scanner.display_error('Invalid symbol for start of line.')
                 continue
 
             # do this at end of all lines
@@ -142,7 +142,7 @@ class Parser:
             for floating_input in floating_inputs:
                 floating_inputs_list.append(self.names.get_name_string(floating_input[0])
                                             + '.' + self.names.get_name_string(floating_input[1]))
-            self.scanner.display_error("The following inputs are floating: " + str(floating_inputs_list))
+            self.scanner.display_error("The following inputs are floating: " + str(floating_inputs_list), False)
 
         # check at least one monitor
         if len(self.monitors.monitors_dictionary) == 0:
@@ -290,7 +290,7 @@ class Parser:
         return [name_id, port_id]
         # current symbol is last symbol of input (different from output function)
 
-"""
+
 #quick tests
 names = Names()
 cwd=(os.getcwd())
@@ -315,4 +315,4 @@ for device_id in device_ids:
                 print('Input ' + names.get_name_string(input_id) + ' connected to', names.get_name_string(output[0]))
                 if output[1] != None:
                     print('Output port ' + names.get_name_string(output[1]))
-"""
+

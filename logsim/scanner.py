@@ -238,15 +238,13 @@ class Scanner:
                 print(self.file.readline().strip())
                 print(" "*(error_position-self.last_semicolon_pos-4), end='')
                 print("^")
-                print("***ERROR:{}".format(error_message))
+                print("***ERROR: {}".format(error_message))
                 print('\n')
             else:
-                print("***ERROR:{}".format(error_message))
+                print("***ERROR: {}".format(error_message))
                 print('\n')
 
-        if error_message == 'Expected semicolon':
-            print(self.current_character)
-            self.last_semicolon_pos = self.file.tell()
+        self.last_semicolon_pos = self.file.tell()
 
 
 """
