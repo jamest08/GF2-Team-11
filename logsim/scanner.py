@@ -90,6 +90,7 @@ class Scanner:
         self.last_semicolon_pos = 0
         self.last_last_semicolon_pos = 0
         self.last_comment_pos = 0
+        self.error_message = ""
 
 
     def get_symbol(self):
@@ -224,6 +225,7 @@ class Scanner:
         self.error_count += 1
         error_position = self.file.tell()
 
+        self.error_message = error_message
         if self.last_semicolon_pos > self.last_comment_pos:
             if self.current_character == ';':
                 pos = self.last_last_semicolon_pos
