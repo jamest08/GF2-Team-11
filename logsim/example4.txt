@@ -15,7 +15,7 @@ connect D2.Q to D3.CLK;
 connect D1.QBAR to D1.DATA;
 connect D2.QBAR to D2.DATA;
 connect D3.QBAR to D3.DATA;
-connect D1.Q to xgate.I1;
+connect D1.Q  xgate.I1;
 connect D2.Q to xgate.I2;
 connect D3.Q to xgate.I3;
 monitor D1.Q D2.Q D3.Q xgate;

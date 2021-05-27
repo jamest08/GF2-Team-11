@@ -88,7 +88,9 @@ class Scanner:
         self.file = self.open_file(self.path)
         self.error_count = 0
         self.last_semicolon_pos = 0
+        self.last_last_semicolon_pos = 0
         self.last_comment_pos = 0
+
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
@@ -122,6 +124,7 @@ class Scanner:
             symbol.type = self.SEMICOLON
             [symbol.id] = self.names.lookup([";"])
             symbol.pos = self.file.tell()
+            self.last_last_semicolon_pos = self.last_semicolon_pos
             self.last_semicolon_pos = self.file.tell()
 
         elif self.current_character == "":
@@ -222,27 +225,30 @@ class Scanner:
         error_position = self.file.tell()
 
         if self.last_semicolon_pos > self.last_comment_pos:
-            pos = self.last_semicolon_pos
+            if self.current_character == ';':
+                pos = self.last_last_semicolon_pos
+                difference = error_position - self.last_last_semicolon_pos
+            else:
+                pos = self.last_semicolon_pos
+                difference = error_position-self.last_semicolon_pos
         else:
             pos = self.last_comment_pos
+            difference = error_position - self.last_comment_pos
 
         if pos == 0:
             self.file.seek(pos)
         else:
-            self.file.seek(pos+2)
+            self.file.seek(pos+1)
 
         if type(error_message) != str:
             raise TypeError("Error message not a string")
         else:
             if caret is True:
                 print(self.file.readline().strip())
-                print(" "*(error_position-self.last_semicolon_pos-4), end='')
+                print(" "*(difference-3), end='')
                 print("^")
-                print("***ERROR: {}".format(error_message))
-                print('\n')
-            else:
-                print("***ERROR: {}".format(error_message))
-                print('\n')
+            print("***ERROR: {}".format(error_message))
+            print('\n')
 
         self.last_semicolon_pos = self.file.tell()
 
