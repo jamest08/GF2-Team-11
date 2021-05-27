@@ -238,7 +238,11 @@ class Scanner:
         if pos == 0:
             self.file.seek(pos)
         else:
-            self.file.seek(pos+1)
+            self.file.seek(pos)
+            self.skip_spaces()
+            cur_pos = self.file.tell()
+            self.file.seek(cur_pos-1, 0)
+            
 
         if type(error_message) != str:
             raise TypeError("Error message not a string")
@@ -251,6 +255,7 @@ class Scanner:
             print('\n')
 
         self.last_semicolon_pos = self.file.tell()
+        
 
 
 """

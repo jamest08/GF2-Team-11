@@ -1,6 +1,6 @@
 define G1 G2 as NAND 2 inputs;
 define SW1 SW2 as SWITCH 0 state;
-connect SW1 to G1.I1;
+connects SW1 to G1.I1;
 connect SW2 to G2.I2;
 connect G1 to G2.I1; #connection#
 connect G2 to G1.I2;

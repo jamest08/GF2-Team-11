@@ -12,20 +12,20 @@ from monitors import Monitors
 from parse import Parser
 
 
-@pytest.mark.parametrize("example", [
-    ("example1.txt"),
-    ("example1_with_syntax_errors.txt"),
-    ("example2_with_syntax_errors.txt"),
-    ("example3.txt"),
-    ("example4.txt")
+@pytest.mark.parametrize("example,num_errors", [
+    ("example1.txt",0),
+    ("example1_with_syntax_errors.txt",0),
+    ("example2_with_syntax_errors.txt",0),
+    ("example3.txt",0),
+    ("example4.txt",0)
 ])
 
 @pytest.fixture
 def file_list():
     return["example1.txt", "example1_with_syntax_errors.txt", "example2_with_syntax_errors.txt", "example3.txt", "example4.txt"]
 
-"""@pytest.fixture
-def parser():
+@pytest.fixture
+def parser(example):
     Return an instance of a scanner using .
     print("\nNow opening file...")
 
@@ -44,9 +44,15 @@ def parser():
         network = Network(names, devices)
         monitors = Monitors(names, devices, network)
         parser = Parser(names, devices, network, monitors, scanner)
-        parser_list.append(parser)
 
-    return parser_list"""
+    return parser
+
+def test_get_error_amount(example, num_errors):
+    """Test if get_string returns the expected string."""
+    # Name is present
+    assert used_names.get_name_string(name_id) == expected_string
+    # Name is absent
+    assert new_names.get_name_string(name_id) is None
 
 
 
