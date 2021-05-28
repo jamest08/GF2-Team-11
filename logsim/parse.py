@@ -91,7 +91,7 @@ class Parser:
                 if output_id is None:
                     continue
                 if self.current_symbol.id != self.names.query('to'):
-                    self.scanner.display_error("Expected keyword 'to'")
+                    self.scanner.display_error("Expected keyword 'to'.")
                     continue
                 self.current_symbol = self.scanner.get_symbol()
                 [input_id, input_port_id] = self.input()
@@ -291,7 +291,7 @@ class Parser:
         return [name_id, port_id]
         # current symbol is last symbol of input (different from output function)
 
-
+"""
 #quick tests
 names = Names()
 cwd=(os.getcwd())
@@ -306,7 +306,7 @@ network = Network(names, devices)
 monitors = Monitors(names, devices, network)
 parser = Parser(names, devices, network, monitors, scanner)
 parser.parse_network()
-"""
+
 device_ids = devices.find_devices()
 for device_id in device_ids:
     print(names.get_name_string(devices.get_device(device_id).device_kind), names.get_name_string(device_id))

@@ -16,4 +16,3 @@ connect D2.QBAR to D2.DATA;
 connect D3.QBAR to D3.DATA;
 monitor D1.Q D2.Q D3.Q;
 END
-
