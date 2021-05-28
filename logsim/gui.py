@@ -241,6 +241,13 @@ class Gui(wx.Frame):
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
+        self.help_text = wx.StaticText(self, wx.ID_ANY, """User commands: \n 
+        r N       - run the simulation for N cycles \n 
+        c N       - continue the simulation for N cycles \n
+        s X N     - set switch X to N (0 or 1) \n
+        m X       - set a monitor on signal X \n
+        z X       - zap the monitor on signal X \n
+        q         - quit the program """)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
@@ -261,6 +268,7 @@ class Gui(wx.Frame):
         side_sizer.Add(self.spin, 1, wx.ALL, 5)
         side_sizer.Add(button_sizer, 1, wx.ALL, 5)
         side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        side_sizer.Add(self.help_text, 10, wx.TOP, 10)
 
         button_sizer.Add(self.run_button, 1, wx.ALL, 5)
         button_sizer.Add(self.quit_button, 1, wx.ALL, 5)
@@ -308,9 +316,10 @@ class Gui(wx.Frame):
         self.canvas.render(text)
 
         self.line = text_box_value
+        self.cursor = 0
 
         command = self.read_command()  # read the first character
-        while command != "q":
+        if command != "q":
             if command == "h":
                 self.help_command()
             elif command == "s":
@@ -325,17 +334,8 @@ class Gui(wx.Frame):
                 self.continue_command()
             else:
                 print("Invalid command. Enter 'h' for help.")
-            self.canvas.render("text")  # get the user entry
-            command = self.read_command()  # read the first character
 
 #########################################################################
-
-    def get_line(self):
-        """Print prompt for the user and update the user entry."""
-        self.cursor = 0
-        self.line = input("#: ")
-        while self.line == "":  # if the user enters a blank line
-            self.line = input("#: ")
 
     def read_command(self):
         """Return the first non-whitespace character."""
@@ -425,17 +425,6 @@ class Gui(wx.Frame):
                 return None
 
         return number
-
-    def help_command(self):
-        """Print a list of valid commands."""
-        print("User commands:")
-        print("r N       - run the simulation for N cycles")
-        print("c N       - continue the simulation for N cycles")
-        print("s X N     - set switch X to N (0 or 1)")
-        print("m X       - set a monitor on signal X")
-        print("z X       - zap the monitor on signal X")
-        print("h         - help (this command)")
-        print("q         - quit the program")
 
     def switch_command(self):
         """Set the specified switch to the specified signal level."""
