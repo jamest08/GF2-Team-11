@@ -71,11 +71,11 @@ class Scanner:
             raise TypeError("names arguments not an instance of Names class")
 
         self.symbol_type_list = [self.FULLSTOP, self.SEMICOLON,
-        self.KEYWORD, self.NUMBER, self.NAME, self.INVALID, self.EOF] = range(7)
+                                 self.KEYWORD, self.NUMBER, self.NAME, self.INVALID, self.EOF] = range(7)
         self.keywords_list = ["define", "connect", "monitor", 
-          "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH", 
-          "state", "NAND", "AND", "OR", "NOR", "inputs", 
-          "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
+                              "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH", 
+                              "state", "NAND", "AND", "OR", "NOR", "inputs", 
+                              "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
         [self.define_ID, self.connect_ID, self.monitor_ID,
             self.END_ID, self.as_ID, self.XOR_ID, self.DTYPE_ID,
             self.CLOCK_ID, self.SWITCH_ID, self.state_ID,
