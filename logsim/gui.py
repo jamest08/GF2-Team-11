@@ -72,6 +72,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
+        self.devices = devices
+        self.monitors = monitors
+
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -235,6 +238,7 @@ class Gui(wx.Frame):
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
+        self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
 
@@ -242,22 +246,35 @@ class Gui(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
+        self.quit_button.Bind(wx.EVT_BUTTON, self.on_quit_button)
         self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         side_sizer = wx.BoxSizer(wx.VERTICAL)
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
         main_sizer.Add(side_sizer, 1, wx.ALL, 5)
 
         side_sizer.Add(self.text, 1, wx.TOP, 10)
         side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(self.run_button, 1, wx.ALL, 5)
+        side_sizer.Add(button_sizer, 1, wx.ALL, 5)
         side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+
+        button_sizer.Add(self.run_button, 1, wx.ALL, 5)
+        button_sizer.Add(self.quit_button, 1, wx.ALL, 5)
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
+
+        # variables from userint
+
+        self.cycles_completed = 0  # number of simulation cycles completed
+
+        self.character = ""  # current character
+        self.line = ""  # current string entered by the user
+        self.cursor = 0  # cursor position
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -278,9 +295,214 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
         self.canvas.render(text)
+    
+    def on_quit_button(self, event):
+        """Handle the event when the user clicks the reset button."""
+        text = "Run button pressed."
+        self.canvas.render(text)
 
     def on_text_box(self, event):
         """Handle the event when the user enters text."""
         text_box_value = self.text_box.GetValue()
         text = "".join(["New text box value: ", text_box_value])
         self.canvas.render(text)
+
+        self.line = text_box_value
+
+        command = self.read_command()  # read the first character
+        while command != "q":
+            if command == "h":
+                self.help_command()
+            elif command == "s":
+                self.switch_command()
+            elif command == "m":
+                self.monitor_command()
+            elif command == "z":
+                self.zap_command()
+            elif command == "r":
+                self.run_command()
+            elif command == "c":
+                self.continue_command()
+            else:
+                print("Invalid command. Enter 'h' for help.")
+            self.canvas.render("text")  # get the user entry
+            command = self.read_command()  # read the first character
+
+#########################################################################
+
+    def get_line(self):
+        """Print prompt for the user and update the user entry."""
+        self.cursor = 0
+        self.line = input("#: ")
+        while self.line == "":  # if the user enters a blank line
+            self.line = input("#: ")
+
+    def read_command(self):
+        """Return the first non-whitespace character."""
+        self.skip_spaces()
+        return self.character
+
+    def get_character(self):
+        """Move the cursor forward by one character in the user entry."""
+        if self.cursor < len(self.line):
+            self.character = self.line[self.cursor]
+            self.cursor += 1
+        else:  # end of the line
+            self.character = ""
+
+    def skip_spaces(self):
+        """Skip whitespace until a non-whitespace character is reached."""
+        self.get_character()
+        while self.character.isspace():
+            self.get_character()
+
+    def read_string(self):
+        """Return the next alphanumeric string."""
+        self.skip_spaces()
+        name_string = ""
+        if not self.character.isalpha():  # the string must start with a letter
+            print("Error! Expected a name.")
+            return None
+        while self.character.isalnum():
+            name_string = "".join([name_string, self.character])
+            self.get_character()
+        return name_string
+
+    def read_name(self):
+        """Return the name ID of the current string if valid.
+
+        Return None if the current string is not a valid name string.
+        """
+        name_string = self.read_string()
+        if name_string is None:
+            return None
+        else:
+            name_id = self.names.query(name_string)
+        if name_id is None:
+            print("Error! Unknown name.")
+        return name_id
+
+    def read_signal_name(self):
+        """Return the device and port IDs of the current signal name.
+
+        Return None if either is invalid.
+        """
+        device_id = self.read_name()
+        if device_id is None:
+            return None
+        elif self.character == ".":
+            port_id = self.read_name()
+            if port_id is None:
+                return None
+        else:
+            port_id = None
+        return [device_id, port_id]
+
+    def read_number(self, lower_bound, upper_bound):
+        """Return the current number.
+
+        Return None if no number is provided or if it falls outside the valid
+        range.
+        """
+        self.skip_spaces()
+        number_string = ""
+        if not self.character.isdigit():
+            print("Error! Expected a number.")
+            return None
+        while self.character.isdigit():
+            number_string = "".join([number_string, self.character])
+            self.get_character()
+        number = int(number_string)
+
+        if upper_bound is not None:
+            if number > upper_bound:
+                print("Number out of range.")
+                return None
+
+        if lower_bound is not None:
+            if number < lower_bound:
+                print("Number out of range.")
+                return None
+
+        return number
+
+    def help_command(self):
+        """Print a list of valid commands."""
+        print("User commands:")
+        print("r N       - run the simulation for N cycles")
+        print("c N       - continue the simulation for N cycles")
+        print("s X N     - set switch X to N (0 or 1)")
+        print("m X       - set a monitor on signal X")
+        print("z X       - zap the monitor on signal X")
+        print("h         - help (this command)")
+        print("q         - quit the program")
+
+    def switch_command(self):
+        """Set the specified switch to the specified signal level."""
+        switch_id = self.read_name()
+        if switch_id is not None:
+            switch_state = self.read_number(0, 1)
+            if switch_state is not None:
+                if self.devices.set_switch(switch_id, switch_state):
+                    print("Successfully set switch.")
+                else:
+                    print("Error! Invalid switch.")
+
+    def monitor_command(self):
+        """Set the specified monitor."""
+        monitor = self.read_signal_name()
+        if monitor is not None:
+            [device, port] = monitor
+            monitor_error = self.monitors.make_monitor(device, port,
+                                                       self.cycles_completed)
+            if monitor_error == self.monitors.NO_ERROR:
+                print("Successfully made monitor.")
+            else:
+                print("Error! Could not make monitor.")
+
+    def zap_command(self):
+        """Remove the specified monitor."""
+        monitor = self.read_signal_name()
+        if monitor is not None:
+            [device, port] = monitor
+            if self.monitors.remove_monitor(device, port):
+                print("Successfully zapped monitor")
+            else:
+                print("Error! Could not zap monitor.")
+
+    def run_network(self, cycles):
+        """Run the network for the specified number of simulation cycles.
+
+        Return True if successful.
+        """
+        for _ in range(cycles):
+            if self.network.execute_network():
+                self.monitors.record_signals()
+            else:
+                print("Error! Network oscillating.")
+                return False
+        self.monitors.display_signals()
+        return True
+
+    def run_command(self):
+        """Run the simulation from scratch."""
+        self.cycles_completed = 0
+        cycles = self.read_number(0, None)
+
+        if cycles is not None:  # if the number of cycles provided is valid
+            self.monitors.reset_monitors()
+            print("".join(["Running for ", str(cycles), " cycles"]))
+            self.devices.cold_startup()
+            if self.run_network(cycles):
+                self.cycles_completed += cycles
+
+    def continue_command(self):
+        """Continue a previously run simulation."""
+        cycles = self.read_number(0, None)
+        if cycles is not None:  # if the number of cycles provided is valid
+            if self.cycles_completed == 0:
+                print("Error! Nothing to continue. Run first.")
+            elif self.run_network(cycles):
+                self.cycles_completed += cycles
+                print(" ".join(["Continuing for", str(cycles), "cycles.",
+                                "Total:", str(self.cycles_completed)]))
