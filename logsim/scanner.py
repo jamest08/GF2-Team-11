@@ -90,7 +90,7 @@ class Scanner:
         self.last_semicolon_pos = 0
         self.last_last_semicolon_pos = 0
         self.last_comment_pos = 0
-        self.error_message = ""
+        self.error_message_list = []
 
 
     def get_symbol(self):
@@ -98,7 +98,6 @@ class Scanner:
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
         if self.current_character == "#":
-            print("hello")
             self.skip_comment()
             return self.get_symbol()
 
@@ -229,7 +228,7 @@ class Scanner:
         self.error_count += 1
         error_position = self.file.tell()
 
-        self.error_message = error_message
+        self.error_message_list.append(error_message) 
         if self.last_semicolon_pos > self.last_comment_pos:
             if self.current_character == ';':
                 pos = self.last_last_semicolon_pos

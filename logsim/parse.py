@@ -284,12 +284,12 @@ class Parser:
         return [name_id, port_id]
         # current symbol is last symbol of input (different from output function)
 
-"""
+
 #quick tests
 names = Names()
 cwd=(os.getcwd())
 
-example = "example6_rubbish.txt"
+example = "example1.txt"
 #path = cwd + '/' + example
 path = cwd + '\\' +example
 
@@ -302,11 +302,12 @@ parser.parse_network()
 
 device_ids = devices.find_devices()
 for device_id in device_ids:
-    print(names.get_name_string(devices.get_device(device_id).device_kind), names.get_name_string(device_id))
+    #print(names.get_name_string(devices.get_device(device_id).device_kind), names.get_name_string(device_id))
     for input_id in devices.get_device(device_id).inputs:
         output = network.get_connected_output(device_id, input_id)
+        print(output)
         if output != None:
                 print('Input ' + names.get_name_string(input_id) + ' connected to', names.get_name_string(output[0]))
                 if output[1] != None:
                     print('Output port ' + names.get_name_string(output[1]))
-"""
+

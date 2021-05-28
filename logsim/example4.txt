@@ -1,14 +1,15 @@
-define CL1 as CLOCK period 2;
-define SW1 as SWITCH 1 state;
+define CL1 as CLOCK 2;
+define SW1 as SWITCH 7 state;
 define SW2 as SWITCH 0 state;
 define D1 D2 D3 as DTYPE;
-define xgate as XOR;
+define to as XOR;
+define g as NAND 20 inputs
 connect SW1 to D1.SET;
 connect SW2 to D1.CLEAR;
-connect SW1 to D2.SET;
+connect SW1 to D2.;
 connect SW2 to D2.CLEAR;
 connect SW1 to D3.SET;
-connect SW2 to D3.CLEAR;
+connect SW2. to D3.CLEAR;
 connect CL1 to D1.CLK;
 connect D1.Q to D2.CLK;
 connect D2.Q to D3.CLK;
