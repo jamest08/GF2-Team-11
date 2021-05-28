@@ -12,6 +12,8 @@ import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 
+import sys
+
 from names import Names
 from devices import Devices
 from network import Network
@@ -74,6 +76,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         self.devices = devices
         self.monitors = monitors
+
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -194,6 +197,44 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
+    
+    def get_margin(self):
+        """Return the length of the longest monitor's name.
+
+        Return None if no signals are being monitored. This is useful for
+        finding out how much space to leave after each monitor's name before
+        starting to draw the signal trace.
+        """
+        length_list = []  # for storing name lengths
+        for device_id, output_id in self.monitors.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            name_length = len(monitor_name)
+            length_list.append(name_length)
+        if length_list:  # if the list is not empty
+            return max(length_list)
+        else:
+            return None
+    
+    def display_signals(self):
+        """Display the signal trace(s) in the GUI."""
+        margin = self.get_margin()
+        for device_id, output_id in self.monitors.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            name_length = len(monitor_name)
+            signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+            print(monitor_name + (margin - name_length) * " ", end=": ")
+            for signal in signal_list:
+                if signal == self.devices.HIGH:
+                    print("-", end="")
+                if signal == self.devices.LOW:
+                    print("_", end="")
+                if signal == self.devices.RISING:
+                    print("/", end="")
+                if signal == self.devices.FALLING:
+                    print("\\", end="")
+                if signal == self.devices.BLANK:
+                    print(" ", end="")
+            print("\n", end="")
 
 
 class Gui(wx.Frame):
@@ -284,6 +325,11 @@ class Gui(wx.Frame):
         self.line = ""  # current string entered by the user
         self.cursor = 0  # cursor position
 
+        self.names = names
+        self.devices = devices
+        self.monitors = monitors
+        self.network = network
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
@@ -320,9 +366,7 @@ class Gui(wx.Frame):
 
         command = self.read_command()  # read the first character
         if command != "q":
-            if command == "h":
-                self.help_command()
-            elif command == "s":
+            if command == "s":
                 self.switch_command()
             elif command == "m":
                 self.monitor_command()
@@ -334,6 +378,9 @@ class Gui(wx.Frame):
                 self.continue_command()
             else:
                 print("Invalid command. Enter 'h' for help.")
+        else:
+            print("quitting program")
+            sys.exit()
 
 #########################################################################
 
@@ -470,7 +517,7 @@ class Gui(wx.Frame):
             else:
                 print("Error! Network oscillating.")
                 return False
-        self.monitors.display_signals()
+        self.canvas.display_signals()
         return True
 
     def run_command(self):
