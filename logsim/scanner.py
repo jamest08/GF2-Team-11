@@ -98,6 +98,7 @@ class Scanner:
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
         if self.current_character == "#":
+            print("hello")
             self.skip_comment()
             return self.get_symbol()
 
@@ -212,9 +213,13 @@ class Scanner:
     def skip_comment(self):
         """Skips comments enclosed in hashes."""
         z = self.file.read(1)
-
-        while z != "#" and "":
+        
+        end_of_file= False
+        while z != "#" and end_of_file is False:
             z = self.file.read(1)
+            if z == "":
+                end_of_file = True
+
            
         self.last_comment_pos = self.file.tell()
         self.current_character = z
