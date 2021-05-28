@@ -216,7 +216,6 @@ class Scanner:
         while z != "#":
             z = self.file.read(1)
 
-        z = self.file.read(1)
         self.last_comment_pos = self.file.tell()
         self.current_character = z
 
