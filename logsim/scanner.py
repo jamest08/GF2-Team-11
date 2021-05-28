@@ -99,7 +99,7 @@ class Scanner:
         self.skip_spaces()  # current character now not whitespace
         if self.current_character == "#":
             self.skip_comment()
-            self.skip_spaces()
+            return self.get_symbol()
 
         if self.current_character.isalpha():  # name
             name_string = self.get_name()
@@ -216,7 +216,6 @@ class Scanner:
         while z != "#":
             z = self.file.read(1)
 
-        z = self.file.read(1)
         self.last_comment_pos = self.file.tell()
         self.current_character = z
 

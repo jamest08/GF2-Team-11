@@ -98,12 +98,11 @@ class Parser:
                 if input_id is None:
                     continue
                 # check semantic errors
-                if self.scanner.error_count == 0:
-                    error_type = self.network.make_connection(output_id, output_port_id,
-                                                              input_id, input_port_id)
-                    if error_type == self.network.INPUT_CONNECTED:
-                        self.scanner.display_error("Input is already in a connection")
-                        continue
+                error_type = self.network.make_connection(output_id, output_port_id,
+                                                            input_id, input_port_id)
+                if error_type == self.network.INPUT_CONNECTED:
+                    self.scanner.display_error("Input is already in a connection")
+                    continue
                 self.current_symbol = self.scanner.get_symbol()
 
             elif self.current_symbol.id == self.names.query('monitor'):
@@ -114,12 +113,11 @@ class Parser:
                     if output_id is None:
                         need_continue = True
                         break
-                    if self.scanner.error_count == 0:
-                        error_type = self.monitors.make_monitor(output_id, output_port_id)
-                        if error_type == self.monitors.MONITOR_PRESENT:
-                            self.scanner.display_error("A monitor has already been placed at this output port.")
-                            need_continue = True
-                            break
+                    error_type = self.monitors.make_monitor(output_id, output_port_id)
+                    if error_type == self.monitors.MONITOR_PRESENT:
+                        self.scanner.display_error("A monitor has already been placed at this output port.")
+                        need_continue = True
+                        break
                 if need_continue:
                     continue
 
@@ -176,10 +174,9 @@ class Parser:
             if self.current_symbol.id != self.names.query('state'):
                 self.scanner.display_error("Expected keyword 'state'")
                 return False
-            if self.scanner.error_count == 0:
-                for name_id in name_ids:
-                    self.devices.make_device(name_id, self.devices.SWITCH, switch_state)
-                    # errors all covered by syntax
+            for name_id in name_ids:
+                self.devices.make_device(name_id, self.devices.SWITCH, switch_state)
+                # errors all covered by syntax
 
         elif self.current_symbol.id in [self.names.query('NAND'), self.names.query('AND'),
                                         self.names.query('OR'), self.names.query('NOR')]:
@@ -190,12 +187,11 @@ class Parser:
             if self.current_symbol.id != self.names.query('inputs'):
                 self.scanner.display_error("Expected keyword 'inputs'")
                 return False
-            if self.scanner.error_count == 0:
-                for name_id in name_ids:
-                    error_type = self.devices.make_device(name_id, gate_id, num_inputs)
-                    if error_type == self.devices.INVALID_QUALIFIER:
-                        self.scanner.display_error("Number of inputs must be integer in range(1, 17)")
-                        return False
+            for name_id in name_ids:
+                error_type = self.devices.make_device(name_id, gate_id, num_inputs)
+                if error_type == self.devices.INVALID_QUALIFIER:
+                    self.scanner.display_error("Number of inputs must be integer in range(1, 17)")
+                    return False
 
         elif self.current_symbol.id == self.names.query('CLOCK'):
             self.current_symbol = self.scanner.get_symbol()
@@ -209,22 +205,19 @@ class Parser:
             except ValueError:
                 self.scanner.display_error("Expected integer period.")
                 return False
-            if self.scanner.error_count == 0:
-                for name_id in name_ids:
-                    error_type = self.devices.make_device(name_id, self.devices.CLOCK, clock_period//2)
-                    if error_type == self.devices.INVALID_QUALIFIER:
-                        self.scanner.display_error("Expected half period >= 1 simulation cycle")
-                        return False
+            for name_id in name_ids:
+                error_type = self.devices.make_device(name_id, self.devices.CLOCK, clock_period//2)
+                if error_type == self.devices.INVALID_QUALIFIER:
+                    self.scanner.display_error("Expected half period >= 1 simulation cycle")
+                    return False
 
         elif self.current_symbol.id == self.names.query('DTYPE'):
-            if self.scanner.error_count == 0:
-                for name_id in name_ids:
-                    self.devices.make_device(name_id, self.devices.D_TYPE)
+            for name_id in name_ids:
+                self.devices.make_device(name_id, self.devices.D_TYPE)
 
         elif self.current_symbol.id == self.names.query('XOR'):
-            if self.scanner.error_count == 0:
-                for name_id in name_ids:
-                    self.devices.make_device(name_id, self.devices.XOR)
+            for name_id in name_ids:
+                self.devices.make_device(name_id, self.devices.XOR)
 
         else:
             self.scanner.display_error('Expected device type')
