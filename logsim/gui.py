@@ -107,19 +107,41 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
 
-        # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(10):
-            x = (i * 20) + 10
-            x_next = (i * 20) + 30
-            if i % 2 == 0:
-                y = 75
-            else:
-                y = 100
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
+        # get list of signals for a single monitor
+
+        device_number = 0
+
+        for device_id, output_id in self.monitors.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+
+            GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
+            GL.glBegin(GL.GL_LINE_STRIP)
+
+            for i in range(len(signal_list)):
+                x = (i * 20) + 10
+                x_next = (i * 20) + 30
+                if signal_list[i] == self.devices.LOW:
+                    y = 75 + device_number*100
+                elif signal_list[i] == self.devices.HIGH:
+                    y = 100 + device_number*100
+                
+                GL.glVertex2f(x, y)
+                GL.glVertex2f(x_next, y)
+            GL.glEnd()
+
+            device_number += 1
+
+            # for i in range(10):
+            #     x = (i * 20) + 10
+            #     x_next = (i * 20) + 30
+            #     if i % 2 == 0:
+            #         y = 75
+            #     else:
+            #         y = 100
+            #     GL.glVertex2f(x, y)
+            #     GL.glVertex2f(x_next, y)
+            # GL.glEnd()
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -217,11 +239,15 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     
     def display_signals(self):
         """Display the signal trace(s) in the GUI."""
+
         margin = self.get_margin()
+
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
             name_length = len(monitor_name)
+
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+
             print(monitor_name + (margin - name_length) * " ", end=": ")
             for signal in signal_list:
                 if signal == self.devices.HIGH:
