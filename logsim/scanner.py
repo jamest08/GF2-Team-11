@@ -213,9 +213,9 @@ class Scanner:
         """Skips comments enclosed in hashes."""
         z = self.file.read(1)
 
-        while z != "#":
+        while z != "#" and "":
             z = self.file.read(1)
-
+           
         self.last_comment_pos = self.file.tell()
         self.current_character = z
 

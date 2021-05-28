@@ -284,12 +284,12 @@ class Parser:
         return [name_id, port_id]
         # current symbol is last symbol of input (different from output function)
 
-"""
+
 #quick tests
 names = Names()
 cwd=(os.getcwd())
 
-example = "example1_with_syntax_errors.txt"
+example = "example4.txt"
 #path = cwd + '/' + example
 path = cwd + '\\' +example
 
@@ -299,7 +299,7 @@ network = Network(names, devices)
 monitors = Monitors(names, devices, network)
 parser = Parser(names, devices, network, monitors, scanner)
 parser.parse_network()
-
+"""
 device_ids = devices.find_devices()
 for device_id in device_ids:
     print(names.get_name_string(devices.get_device(device_id).device_kind), names.get_name_string(device_id))
