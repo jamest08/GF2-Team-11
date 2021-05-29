@@ -50,9 +50,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors):
+    def __init__(self, parent, pos, size, devices, monitors):
         """Initialise canvas properties and useful variables."""
-        super().__init__(parent, -1,
+        super().__init__(parent, -1, pos=pos, size=size,
                          attribList=[wxcanvas.WX_GL_RGBA,
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
                                      wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
@@ -293,7 +293,7 @@ class Gui(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(800, 600))
+        super().__init__(parent=None, title=title, size=(600, 500)) # size of entire window at beginning
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -303,8 +303,9 @@ class Gui(wx.Frame):
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
 
-        # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
+        self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
+        self.scrollable.SetSizeHints(500, 500)  #!!!! what is this doing
+        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS,wx.SHOW_SB_DEFAULT) # !!! cant see vertical scrollbar
 
         # Configure the widgets
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
@@ -333,8 +334,16 @@ class Gui(wx.Frame):
         side_sizer = wx.BoxSizer(wx.VERTICAL)
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
+        # main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
         main_sizer.Add(side_sizer, 1, wx.ALL, 5)
+        main_sizer.Add(self.scrollable, 1, wx.TOP+wx.RIGHT, 5)
+
+        # Canvas for drawing signals
+        self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition,  
+        wx.Size(1000, 1000), devices, monitors) # size of canvas
+        self.canvas.SetSizeHints(500, 500)
+        self.scrollable.SetScrollbars(20, 20, 50, 50)
+        self.scrollable.Scroll(0, 50)
 
         side_sizer.Add(self.text, 1, wx.TOP, 10)
         side_sizer.Add(self.spin, 1, wx.ALL, 5)
@@ -345,7 +354,7 @@ class Gui(wx.Frame):
         button_sizer.Add(self.run_button, 1, wx.ALL, 5)
         button_sizer.Add(self.quit_button, 1, wx.ALL, 5)
 
-        self.SetSizeHints(600, 600)
+        self.SetSizeHints(600, 500) # minimum size of entire window
         self.SetSizer(main_sizer)
 
         # variables from userint
