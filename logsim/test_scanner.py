@@ -9,7 +9,7 @@ from names import Names
 
 @pytest.fixture
 def scanner_one():
-    """Return an instance of a scanner using ."""
+    """Return an instance of a scanner using example 1"""
     print("\nNow opening file...")
 
     # Print the path provided and try to open the file for reading
@@ -26,7 +26,7 @@ def scanner_one():
 
 @pytest.fixture
 def scanner_two():
-    """Return an instance of a scanner using ."""
+    """Return an instance of a scanner using example 2"""
     print("\nNow opening file...")
 
     # Print the path provided and try to open the file for reading
@@ -43,12 +43,12 @@ def scanner_two():
 
 @pytest.fixture
 def scanner_three():
-    """Return an instance of a scanner using ."""
+    """Return an instance of a scanner using example 2 with comments"""
     print("\nNow opening file...")
 
     # Print the path provided and try to open the file for reading
     cwd = os.getcwd()
-    example = "example3.txt"
+    example = "example2_with_comments.txt"
 
     path = "{}/{}".format(cwd, example)
     print(path)
@@ -145,6 +145,8 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
         symbol_two = scanner_two.get_symbol()
         symbol_three = scanner_three.get_symbol()
 
+        print("ex. 2 id: {}, ex. 3 id: {}".format(symbol_two.id, symbol_three.id))
+
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
 
@@ -153,6 +155,8 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
     for i in range(6):
         symbol_two = scanner_two.get_symbol()
         symbol_three = scanner_three.get_symbol()
+
+        print("ex. 2 id: {}, ex. 3 id: {}".format(symbol_two.id, symbol_three.id))
 
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
