@@ -115,16 +115,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             monitor_name = self.devices.get_signal_name(device_id, output_id)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
 
+            x = 10
+            y = 85 + device_number*50
+
+            self.render_text(monitor_name, x, y)
+
             GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
             GL.glBegin(GL.GL_LINE_STRIP)
 
             for i in range(len(signal_list)):
-                x = (i * 20) + 10
-                x_next = (i * 20) + 30
+                x = (i * 20) + 40
+                x_next = (i * 20) + 60
                 if signal_list[i] == self.devices.LOW:
-                    y = 75 + device_number*100
+                    y = 75 + device_number*50
                 elif signal_list[i] == self.devices.HIGH:
-                    y = 100 + device_number*100
+                    y = 100 + device_number*50
                 
                 GL.glVertex2f(x, y)
                 GL.glVertex2f(x_next, y)
@@ -211,7 +216,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_12
+        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
