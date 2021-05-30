@@ -506,6 +506,10 @@ class Gui(wx.Frame):
         text = "Successfully zapped monitor"
         self.canvas.render(text)
 
+        self.monitored.Clear()
+        self.monitored_list = self.monitors.get_signal_names()[0]
+        self.monitored.SetItems(self.monitored_list)
+
         self.not_monitored.Clear()
         self.unmonitored_list = self.monitors.get_signal_names()[1]
         self.not_monitored.SetItems(self.unmonitored_list)
@@ -553,6 +557,10 @@ class Gui(wx.Frame):
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
         self.monitored.SetItems(self.monitored_list)
+
+        self.not_monitored.Clear()
+        self.unmonitored_list = self.monitors.get_signal_names()[1]
+        self.not_monitored.SetItems(self.unmonitored_list)
 
 
     def on_quit_button(self, event):
