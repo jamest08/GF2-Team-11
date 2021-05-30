@@ -506,6 +506,10 @@ class Gui(wx.Frame):
         text = "Successfully zapped monitor"
         self.canvas.render(text)
 
+        self.not_monitored.Clear()
+        self.unmonitored_list = self.monitors.get_signal_names()[1]
+        self.not_monitored.SetItems(self.unmonitored_list)
+
 
     def on_add_button(self, event):
         """Handle the event when the user clicks the run button.
@@ -546,6 +550,10 @@ class Gui(wx.Frame):
         text = "Successfully added monitor"
         self.canvas.render(text)
 
+        self.monitored.Clear()
+        self.monitored_list = self.monitors.get_signal_names()[0]
+        self.monitored.SetItems(self.monitored_list)
+
 
     def on_quit_button(self, event):
         """Handle the event when the user clicks the quit button."""
@@ -557,7 +565,7 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the reset button."""
         text = "reset button pressed."
 
-        # reset all mouse parameters
+        # # reset all mouse parameters
         
         # self.pan_x = 0
         # self.pan_y = 0
