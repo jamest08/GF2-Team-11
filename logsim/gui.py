@@ -9,6 +9,7 @@ MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
 import wx
+from wx.core import BoxSizer
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 
@@ -224,48 +225,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
-    
-    def get_margin(self):
-        """Return the length of the longest monitor's name.
-
-        Return None if no signals are being monitored. This is useful for
-        finding out how much space to leave after each monitor's name before
-        starting to draw the signal trace.
-        """
-        length_list = []  # for storing name lengths
-        for device_id, output_id in self.monitors.monitors_dictionary:
-            monitor_name = self.devices.get_signal_name(device_id, output_id)
-            name_length = len(monitor_name)
-            length_list.append(name_length)
-        if length_list:  # if the list is not empty
-            return max(length_list)
-        else:
-            return None
-    
-    def display_signals(self):
-        """Display the signal trace(s) in the GUI."""
-
-        margin = self.get_margin()
-
-        for device_id, output_id in self.monitors.monitors_dictionary:
-            monitor_name = self.devices.get_signal_name(device_id, output_id)
-            name_length = len(monitor_name)
-
-            signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
-
-            print(monitor_name + (margin - name_length) * " ", end=": ")
-            for signal in signal_list:
-                if signal == self.devices.HIGH:
-                    print("-", end="")
-                if signal == self.devices.LOW:
-                    print("_", end="")
-                if signal == self.devices.RISING:
-                    print("/", end="")
-                if signal == self.devices.FALLING:
-                    print("\\", end="")
-                if signal == self.devices.BLANK:
-                    print(" ", end="")
-            print("\n", end="")
 
 
 class Gui(wx.Frame):
@@ -296,6 +255,7 @@ class Gui(wx.Frame):
         super().__init__(parent=None, title=title, size=(600, 500)) # size of entire window at beginning
 
         # Configure the file menu
+
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
         fileMenu.Append(wx.ID_ABOUT, "&About")
@@ -303,15 +263,52 @@ class Gui(wx.Frame):
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
 
+        # set scrollable area for canvas
+
         self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
         self.scrollable.SetSizeHints(500, 500)  #!!!! what is this doing
-        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS,wx.SHOW_SB_DEFAULT) # !!! cant see vertical scrollbar
+        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS,wx.SHOW_SB_DEFAULT)
 
-        # Configure the widgets
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
+        # Declare "run simulation items"
+        self.spin_value = 0
+        self.run_text = wx.StaticText(self, wx.ID_ANY, "Run Simulation")
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "0")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
+        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
+
+        # Declare "manage switches items"
+
+        self.switches_text = wx.StaticText(self, wx.ID_ANY, "Manage Switches")
+
+        self.switches_id_list = devices.find_devices(devices.SWITCH)
+        self.switches_list = []
+        for id in self.switches_id_list:
+            name = names.get_name_string(id)
+            self.switches_list.append(name)
+
+        self.switches = wx.Choice(self, wx.ID_ANY, choices = self.switches_list)
+        self.switch_setting = wx.Choice(self, wx.ID_ANY, choices = ["0", "1"])
+        self.switch_button = wx.Button(self, wx.ID_ANY, "Switch")
+
+        # Declare "manage monitors items"
+
+        self.monitors_text = wx.StaticText(self, wx.ID_ANY, "Manage Monitors")
+
+        self.monitored_list = monitors.get_signal_names()[0]
+        self.unmonitored_list = monitors.get_signal_names()[1]
+
+        self.monitored = wx.Choice(self, wx.ID_ANY, choices = self.monitored_list)
+        self.not_monitored = wx.Choice(self, wx.ID_ANY, choices = self.unmonitored_list)
+
+        self.zap_monitor_button = wx.Button(self, wx.ID_ANY, "Zap")
+        self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
+        
+        # declare bottom items
+
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
+        self.reset_button = wx.Button(self, wx.ID_ANY, "Reset View")
+
+        '''
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
         self.help_text = wx.StaticText(self, wx.ID_ANY, """User commands: \n 
@@ -321,22 +318,29 @@ class Gui(wx.Frame):
         m X       - set a monitor on signal X \n
         z X       - zap the monitor on signal X \n
         q         - quit the program """)
+        '''
 
         # Bind events to widgets
-        self.Bind(wx.EVT_MENU, self.on_menu)
+
+        # self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        # self.Bind(wx.EVT_MENU, self.on_menu)
+
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
+        self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
+        self.switch_button.Bind(wx.EVT_BUTTON, self.on_switch_button)
+        self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_button)
+        self.zap_monitor_button.Bind(wx.EVT_BUTTON, self.on_zap_button)
         self.quit_button.Bind(wx.EVT_BUTTON, self.on_quit_button)
-        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
+        self.reset_button.Bind(wx.EVT_BUTTON, self.on_reset_button)
+
+        '''need to add binds to new features'''
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.BoxSizer(wx.VERTICAL)
-        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
+        side_sizer = wx.GridBagSizer(9, 4)
         main_sizer.Add(side_sizer, 1, wx.ALL, 5)
-        main_sizer.Add(self.scrollable, 1, wx.TOP+wx.RIGHT, 5)
+        main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition,  
@@ -345,14 +349,36 @@ class Gui(wx.Frame):
         self.scrollable.SetScrollbars(20, 20, 50, 50)
         self.scrollable.Scroll(0, 50)
 
-        side_sizer.Add(self.text, 1, wx.TOP, 10)
-        side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(button_sizer, 1, wx.ALL, 5)
-        side_sizer.Add(self.text_box, 1, wx.ALL, 5)
-        side_sizer.Add(self.help_text, 10, wx.TOP, 10)
+        # place "run simulation" items
 
-        button_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        button_sizer.Add(self.quit_button, 1, wx.ALL, 5)
+        side_sizer.Add(self.run_text, pos = (0, 0), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.spin, pos = (1, 0), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.run_button, pos = (1, 1), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.continue_button, pos = (1, 2), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
+
+        # place "manage switches" items
+
+        side_sizer.Add(self.switches_text, pos = (2, 0), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.switches, pos = (3, 0), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.switch_setting, pos = (3, 1), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.switch_button, pos = (3, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+
+        # place "manage monitors" items
+
+        side_sizer.Add(self.monitors_text, pos = (4, 0), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.monitored, pos = (5, 0), span = (1, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.zap_monitor_button, pos = (5, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.not_monitored, pos = (6, 0), span = (1, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.add_monitor_button, pos = (6, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+
+        # place bottom items
+
+        side_sizer.Add(self.quit_button, pos = (8, 0), span = (1, 1), flag = wx.BOTTOM, border = 5)
+        side_sizer.Add(self.reset_button, pos = (8, 1), span = (1, 1), flag = wx.BOTTOM, border = 5)
+
+
+        # side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        # side_sizer.Add(self.help_text, 10, wx.TOP, 10)
 
         self.SetSizeHints(600, 500) # minimum size of entire window
         self.SetSizer(main_sizer)
@@ -370,6 +396,7 @@ class Gui(wx.Frame):
         self.monitors = monitors
         self.network = network
 
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
@@ -379,154 +406,134 @@ class Gui(wx.Frame):
             wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
 
+
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
         spin_value = self.spin.GetValue()
+        self.spin_value = spin_value
         text = "".join(["New spin control value: ", str(spin_value)])
         self.canvas.render(text)
 
+
     def on_run_button(self, event):
-        """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
+        """Handle the event when the user clicks the run button.
+        Run the simulation from scratch."""
+
+        self.cycles_completed = 0
+        cycles = self.spin_value
+
+        if cycles is not None:  # if the number of cycles provided is valid
+            self.monitors.reset_monitors()
+            print("".join(["Running for ", str(cycles), " cycles"]))
+            self.devices.cold_startup()
+            if self.run_network(cycles):
+                self.cycles_completed += cycles
+        
+        text = "Run simulation for {} cycles.".format(cycles)
         self.canvas.render(text)
-    
-    def on_quit_button(self, event):
-        """Handle the event when the user clicks the reset button."""
-        text = "Run button pressed."
+
+
+    def on_continue_button(self, event):
+        """Handle the event when the user clicks the continue button.
+        Continue a previously run simulation."""
+
+        cycles = self.spin_value
+        if cycles is not None:  # if the number of cycles provided is valid
+            if self.cycles_completed == 0:
+                print("Error! Nothing to continue. Run first.")
+            elif self.run_network(cycles):
+                self.cycles_completed += cycles
+                print(" ".join(["Continuing for", str(cycles), "cycles.",
+                                "Total:", str(self.cycles_completed)]))
+        
+        text = "Continue simulation for {} cycles.".format(cycles)
         self.canvas.render(text)
 
-    def on_text_box(self, event):
-        """Handle the event when the user enters text."""
-        text_box_value = self.text_box.GetValue()
-        text = "".join(["New text box value: ", text_box_value])
-        self.canvas.render(text)
 
-        self.line = text_box_value
-        self.cursor = 0
+    def on_switch_button(self, event):
+        """Handle the event when the user clicks the switch button.
+        Set the specified switch to the specified signal level."""
+        
+        switch_index = self.switches.GetSelection()
+        switch_id = self.switches_id_list[switch_index]
 
-        command = self.read_command()  # read the first character
-        if command != "q":
-            if command == "s":
-                self.switch_command()
-            elif command == "m":
-                self.monitor_command()
-            elif command == "z":
-                self.zap_command()
-            elif command == "r":
-                self.run_command()
-            elif command == "c":
-                self.continue_command()
-            else:
-                print("Invalid command. Enter 'h' for help.")
-        else:
-            print("quitting program")
-            sys.exit()
-
-#########################################################################
-
-    def read_command(self):
-        """Return the first non-whitespace character."""
-        self.skip_spaces()
-        return self.character
-
-    def get_character(self):
-        """Move the cursor forward by one character in the user entry."""
-        if self.cursor < len(self.line):
-            self.character = self.line[self.cursor]
-            self.cursor += 1
-        else:  # end of the line
-            self.character = ""
-
-    def skip_spaces(self):
-        """Skip whitespace until a non-whitespace character is reached."""
-        self.get_character()
-        while self.character.isspace():
-            self.get_character()
-
-    def read_string(self):
-        """Return the next alphanumeric string."""
-        self.skip_spaces()
-        name_string = ""
-        if not self.character.isalpha():  # the string must start with a letter
-            print("Error! Expected a name.")
-            return None
-        while self.character.isalnum():
-            name_string = "".join([name_string, self.character])
-            self.get_character()
-        return name_string
-
-    def read_name(self):
-        """Return the name ID of the current string if valid.
-
-        Return None if the current string is not a valid name string.
-        """
-        name_string = self.read_string()
-        if name_string is None:
-            return None
-        else:
-            name_id = self.names.query(name_string)
-        if name_id is None:
-            print("Error! Unknown name.")
-        return name_id
-
-    def read_signal_name(self):
-        """Return the device and port IDs of the current signal name.
-
-        Return None if either is invalid.
-        """
-        device_id = self.read_name()
-        if device_id is None:
-            return None
-        elif self.character == ".":
-            port_id = self.read_name()
-            if port_id is None:
-                return None
-        else:
-            port_id = None
-        return [device_id, port_id]
-
-    def read_number(self, lower_bound, upper_bound):
-        """Return the current number.
-
-        Return None if no number is provided or if it falls outside the valid
-        range.
-        """
-        self.skip_spaces()
-        number_string = ""
-        if not self.character.isdigit():
-            print("Error! Expected a number.")
-            return None
-        while self.character.isdigit():
-            number_string = "".join([number_string, self.character])
-            self.get_character()
-        number = int(number_string)
-
-        if upper_bound is not None:
-            if number > upper_bound:
-                print("Number out of range.")
-                return None
-
-        if lower_bound is not None:
-            if number < lower_bound:
-                print("Number out of range.")
-                return None
-
-        return number
-
-    def switch_command(self):
-        """Set the specified switch to the specified signal level."""
-        switch_id = self.read_name()
         if switch_id is not None:
-            switch_state = self.read_number(0, 1)
+            choice = int(self.switch_setting.GetSelection())
+            switch_state = choice
             if switch_state is not None:
                 if self.devices.set_switch(switch_id, switch_state):
                     print("Successfully set switch.")
                 else:
                     print("Error! Invalid switch.")
+        
+        text = "Successfully set switch"
+        self.canvas.render(text)
 
-    def monitor_command(self):
-        """Set the specified monitor."""
-        monitor = self.read_signal_name()
+
+    def on_zap_button(self, event):
+        """Handle the event when the user clicks the run button.
+        Remove the specified monitor."""
+
+        monitor_name = self.monitored.GetString(self.monitored.GetSelection())
+        device_name_list = []
+        port_name_list = []
+        is_device = True # keep track of when '.' is hit.
+        for i in monitor_name:
+            if i.isalnum() is True and is_device is True:
+                device_name_list.append(i)
+            elif i.isalnum() is True:
+                port_name_list.append(i)
+            else:
+                is_device = 0
+        
+        device_name = ''.join(device_name_list)
+        port_name = ''.join(port_name_list)
+
+        device_id = self.names.query(device_name)
+        if port_name == '':
+            port_id = None
+        else:
+            port_id = self.names.query(port_name)
+
+        monitor = [device_id, port_id]
+        if monitor is not None:
+            [device, port] = monitor
+            if self.monitors.remove_monitor(device, port):
+                print("Successfully zapped monitor")
+            else:
+                print("Error! Could not zap monitor.")
+    
+        text = "Successfully zapped monitor"
+        self.canvas.render(text)
+
+
+    def on_add_button(self, event):
+        """Handle the event when the user clicks the run button.
+        Set the specified monitor."""
+
+        monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
+        device_name_list = []
+        port_name_list = []
+        is_device = True # keep track of when '.' is hit.
+        for i in monitor_name:
+            if i.isalnum() is True and is_device is True:
+                device_name_list.append(i)
+            elif i.isalnum() is True:
+                port_name_list.append(i)
+            else:
+                is_device = 0
+        
+        device_name = ''.join(device_name_list)
+        port_name = ''.join(port_name_list)
+
+        device_id = self.names.query(device_name)
+        if port_name == '':
+            port_id = None
+        else:
+            port_id = self.names.query(port_name)
+
+        monitor = [device_id, port_id]
+        
         if monitor is not None:
             [device, port] = monitor
             monitor_error = self.monitors.make_monitor(device, port,
@@ -535,16 +542,33 @@ class Gui(wx.Frame):
                 print("Successfully made monitor.")
             else:
                 print("Error! Could not make monitor.")
+        
+        text = "Successfully added monitor"
+        self.canvas.render(text)
 
-    def zap_command(self):
-        """Remove the specified monitor."""
-        monitor = self.read_signal_name()
-        if monitor is not None:
-            [device, port] = monitor
-            if self.monitors.remove_monitor(device, port):
-                print("Successfully zapped monitor")
-            else:
-                print("Error! Could not zap monitor.")
+
+    def on_quit_button(self, event):
+        """Handle the event when the user clicks the quit button."""
+        print("quitting program")
+        sys.exit()
+
+
+    def on_reset_button(self, event):
+        """Handle the event when the user clicks the reset button."""
+        text = "reset button pressed."
+
+        # reset all mouse parameters
+        
+        # self.pan_x = 0
+        # self.pan_y = 0
+        # self.last_mouse_x = 0
+        # self.last_mouse_y = 0
+
+        # # Initialise variables for zooming
+        # self.zoom = 1
+
+        self.canvas.render(text)
+
 
     def run_network(self, cycles):
         """Run the network for the specified number of simulation cycles.
@@ -557,28 +581,5 @@ class Gui(wx.Frame):
             else:
                 print("Error! Network oscillating.")
                 return False
-        self.canvas.display_signals()
+        self.monitors.display_signals()
         return True
-
-    def run_command(self):
-        """Run the simulation from scratch."""
-        self.cycles_completed = 0
-        cycles = self.read_number(0, None)
-
-        if cycles is not None:  # if the number of cycles provided is valid
-            self.monitors.reset_monitors()
-            print("".join(["Running for ", str(cycles), " cycles"]))
-            self.devices.cold_startup()
-            if self.run_network(cycles):
-                self.cycles_completed += cycles
-
-    def continue_command(self):
-        """Continue a previously run simulation."""
-        cycles = self.read_number(0, None)
-        if cycles is not None:  # if the number of cycles provided is valid
-            if self.cycles_completed == 0:
-                print("Error! Nothing to continue. Run first.")
-            elif self.run_network(cycles):
-                self.cycles_completed += cycles
-                print(" ".join(["Continuing for", str(cycles), "cycles.",
-                                "Total:", str(self.cycles_completed)]))
