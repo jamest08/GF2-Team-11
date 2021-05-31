@@ -120,13 +120,15 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             y = 85 + device_number*50
 
             self.render_text(monitor_name, x, y)
+            margin = self.monitors.get_margin()
+            # print(margin)
 
             GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
             GL.glBegin(GL.GL_LINE_STRIP)
 
             for i in range(len(signal_list)):
-                x = (i * 20) + 40
-                x_next = (i * 20) + 60
+                x = (i * 20) + 40 + margin*10
+                x_next = (i * 20) + 60 + margin*10
                 if signal_list[i] == self.devices.LOW:
                     y = 75 + device_number*50
                 elif signal_list[i] == self.devices.HIGH:
@@ -424,12 +426,12 @@ class Gui(wx.Frame):
 
         if cycles is not None:  # if the number of cycles provided is valid
             self.monitors.reset_monitors()
-            print("".join(["Running for ", str(cycles), " cycles"]))
+            text = "".join(["Running for ", str(cycles), " cycles"])
+            print(text)
             self.devices.cold_startup()
             if self.run_network(cycles):
                 self.cycles_completed += cycles
         
-        text = "Run simulation for {} cycles.".format(cycles)
         self.canvas.render(text)
 
 
@@ -440,13 +442,14 @@ class Gui(wx.Frame):
         cycles = self.spin_value
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
-                print("Error! Nothing to continue. Run first.")
+                text = "Error! Nothing to continue. Run first."
+                print(text)
             elif self.run_network(cycles):
                 self.cycles_completed += cycles
-                print(" ".join(["Continuing for", str(cycles), "cycles.",
-                                "Total:", str(self.cycles_completed)]))
+                text = " ".join(["Continuing for", str(cycles), "cycles.",
+                                "Total:", str(self.cycles_completed)])
+                print(text)
         
-        text = "Continue simulation for {} cycles.".format(cycles)
         self.canvas.render(text)
 
 
@@ -462,11 +465,12 @@ class Gui(wx.Frame):
             switch_state = choice
             if switch_state is not None:
                 if self.devices.set_switch(switch_id, switch_state):
-                    print("Successfully set switch.")
+                    text = "Successfully set switch."
+                    print(text)
                 else:
-                    print("Error! Invalid switch.")
+                    text = "Error! Invalid switch."
+                    print(text)
         
-        text = "Successfully set switch"
         self.canvas.render(text)
 
 
@@ -474,7 +478,14 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the run button.
         Remove the specified monitor."""
 
-        monitor_name = self.monitored.GetString(self.monitored.GetSelection())
+        try: 
+            monitor_name = self.monitored.GetString(self.monitored.GetSelection())
+        except:
+            text = "Error! Could not zap monitor."
+            print(text)
+            self.canvas.render(text)
+            return False
+
         device_name_list = []
         port_name_list = []
         is_device = True # keep track of when '.' is hit.
@@ -499,11 +510,12 @@ class Gui(wx.Frame):
         if monitor is not None:
             [device, port] = monitor
             if self.monitors.remove_monitor(device, port):
-                print("Successfully zapped monitor")
+                text = "Successfully zapped monitor"
+                print(text)
             else:
-                print("Error! Could not zap monitor.")
+                text = "Error! Could not zap monitor."
+                print(text)
     
-        text = "Successfully zapped monitor"
         self.canvas.render(text)
 
         self.monitored.Clear()
@@ -519,7 +531,14 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the run button.
         Set the specified monitor."""
 
-        monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
+        try:
+            monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
+        except:
+            text = "Error! Could not make monitor."
+            print(text)
+            self.canvas.render(text)
+            return False
+
         device_name_list = []
         port_name_list = []
         is_device = True # keep track of when '.' is hit.
@@ -547,11 +566,12 @@ class Gui(wx.Frame):
             monitor_error = self.monitors.make_monitor(device, port,
                                                        self.cycles_completed)
             if monitor_error == self.monitors.NO_ERROR:
-                print("Successfully made monitor.")
+                text = "Successfully made monitor."
+                print(text)
             else:
-                print("Error! Could not make monitor.")
+                text = "Error! Could not make monitor."
+                print(text)
         
-        text = "Successfully added monitor"
         self.canvas.render(text)
 
         self.monitored.Clear()
@@ -595,7 +615,9 @@ class Gui(wx.Frame):
             if self.network.execute_network():
                 self.monitors.record_signals()
             else:
-                print("Error! Network oscillating.")
+                text = "Error! Network oscillating."
+                print(text)
+                self.canvas.render(text)
                 return False
         self.monitors.display_signals()
         return True
