@@ -272,6 +272,7 @@ class Gui(wx.Frame):
         self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS,wx.SHOW_SB_DEFAULT)
 
         # Declare "run simulation items"
+
         self.spin_value = 0
         self.run_text = wx.StaticText(self, wx.ID_ANY, "Run Simulation")
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "0")
@@ -310,6 +311,8 @@ class Gui(wx.Frame):
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.reset_button = wx.Button(self, wx.ID_ANY, "Reset View")
 
+        self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "", style = wx.TE_MULTILINE|wx.TE_READONLY)
+
         '''
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
@@ -340,8 +343,9 @@ class Gui(wx.Frame):
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.GridBagSizer(9, 4)
-        main_sizer.Add(side_sizer, 1, wx.ALL, 5)
+        side_sizer = wx.GridBagSizer(12, 4)
+        main_sizer.Add(side_sizer, 1, wx.TOP|wx.LEFT, 5)
+        main_sizer.AddSpacer(5)
         main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
 
         # Canvas for drawing signals
@@ -377,6 +381,7 @@ class Gui(wx.Frame):
 
         side_sizer.Add(self.quit_button, pos = (8, 0), span = (1, 1), flag = wx.BOTTOM, border = 5)
         side_sizer.Add(self.reset_button, pos = (8, 1), span = (1, 1), flag = wx.BOTTOM, border = 5)
+        side_sizer.Add(self.dialogue_box, pos = (9, 0), span = (3, 4), flag = wx.EXPAND, border = 5)
 
 
         # side_sizer.Add(self.text_box, 1, wx.ALL, 5)
@@ -415,6 +420,7 @@ class Gui(wx.Frame):
         self.spin_value = spin_value
         text = "".join(["New spin control value: ", str(spin_value)])
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
 
     def on_run_button(self, event):
@@ -433,6 +439,7 @@ class Gui(wx.Frame):
                 self.cycles_completed += cycles
         
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
 
     def on_continue_button(self, event):
@@ -451,6 +458,7 @@ class Gui(wx.Frame):
                 print(text)
         
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
 
     def on_switch_button(self, event):
@@ -472,6 +480,7 @@ class Gui(wx.Frame):
                     print(text)
         
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
 
     def on_zap_button(self, event):
@@ -484,6 +493,7 @@ class Gui(wx.Frame):
             text = "Error! Could not zap monitor."
             print(text)
             self.canvas.render(text)
+            self.dialogue_box.write("{} \n".format(text))
             return False
 
         device_name_list = []
@@ -517,6 +527,7 @@ class Gui(wx.Frame):
                 print(text)
     
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
@@ -537,6 +548,7 @@ class Gui(wx.Frame):
             text = "Error! Could not make monitor."
             print(text)
             self.canvas.render(text)
+            self.dialogue_box.write("{} \n".format(text))
             return False
 
         device_name_list = []
@@ -573,6 +585,7 @@ class Gui(wx.Frame):
                 print(text)
         
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
@@ -604,6 +617,7 @@ class Gui(wx.Frame):
         # self.zoom = 1
 
         self.canvas.render(text)
+        self.dialogue_box.write("{} \n".format(text))
 
 
     def run_network(self, cycles):
@@ -618,6 +632,7 @@ class Gui(wx.Frame):
                 text = "Error! Network oscillating."
                 print(text)
                 self.canvas.render(text)
+                self.dialogue_box.write("{} \n".format(text))
                 return False
         self.monitors.display_signals()
         return True
