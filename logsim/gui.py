@@ -134,9 +134,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                     y = 75 + device_number*50
                 elif signal_list[i] == self.devices.HIGH:
                     y = 100 + device_number*50
+                elif signal_list[i] == self.devices.BLANK:
+                    y = 0
                 
-                GL.glVertex2f(x, y)
-                GL.glVertex2f(x_next, y)
+                if y != 0:
+                    GL.glVertex2f(x, y)
+                    GL.glVertex2f(x_next, y)
             GL.glEnd()
 
             device_number += 1
