@@ -94,6 +94,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
+
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
@@ -261,9 +262,12 @@ class Gui(wx.Frame):
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
         fileMenu.Append(wx.ID_ABOUT, "&About")
+        fileMenu.SetTitle("File")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
+        print(menuBar.GetMenu(0).GetTitle())
+        menuBar.EnableTop(0,True)
 
         # set scrollable area for canvas
 
@@ -309,26 +313,22 @@ class Gui(wx.Frame):
         # declare bottom items
 
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
-        self.reset_button = wx.Button(self, wx.ID_ANY, "Reset View")
+        self.help_button = wx.Button(self, wx.ID_ANY, "Help")
 
         self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "", style = wx.TE_MULTILINE|wx.TE_READONLY)
 
-        '''
-        self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER)
-        self.help_text = wx.StaticText(self, wx.ID_ANY, """User commands: \n 
-        r N       - run the simulation for N cycles \n 
-        c N       - continue the simulation for N cycles \n
-        s X N     - set switch X to N (0 or 1) \n
-        m X       - set a monitor on signal X \n
-        z X       - zap the monitor on signal X \n
-        q         - quit the program """)
-        '''
+        self.help_text = """HELP MENU: \n
+        To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
+        To continue the simulation for N cycles, select N with the scroll menu and click 'Continue'. \n
+        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu and a state for the switch to be in. Then click 'Switch'. \n
+        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu and click 'Zap'. \n
+        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu and click 'Add'. \n
+        To quit the program, click quit. """
 
         # Bind events to widgets
 
         # self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
-        # self.Bind(wx.EVT_MENU, self.on_menu)
+        self.Bind(wx.EVT_MENU, self.on_menu)
 
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
@@ -337,7 +337,7 @@ class Gui(wx.Frame):
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_button)
         self.zap_monitor_button.Bind(wx.EVT_BUTTON, self.on_zap_button)
         self.quit_button.Bind(wx.EVT_BUTTON, self.on_quit_button)
-        self.reset_button.Bind(wx.EVT_BUTTON, self.on_reset_button)
+        self.help_button.Bind(wx.EVT_BUTTON, self.on_help_button)
 
         '''need to add binds to new features'''
 
@@ -380,7 +380,7 @@ class Gui(wx.Frame):
         # place bottom items
 
         side_sizer.Add(self.quit_button, pos = (8, 0), span = (1, 1), flag = wx.BOTTOM, border = 5)
-        side_sizer.Add(self.reset_button, pos = (8, 1), span = (1, 1), flag = wx.BOTTOM, border = 5)
+        side_sizer.Add(self.help_button, pos = (8, 1), span = (1, 1), flag = wx.BOTTOM, border = 5)
         side_sizer.Add(self.dialogue_box, pos = (9, 0), span = (3, 4), flag = wx.EXPAND, border = 5)
 
 
@@ -403,9 +403,12 @@ class Gui(wx.Frame):
         self.monitors = monitors
         self.network = network
 
+        self.start_view = 0
+
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
+        print("menu button pressed")
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
@@ -419,7 +422,7 @@ class Gui(wx.Frame):
         spin_value = self.spin.GetValue()
         self.spin_value = spin_value
         text = "".join(["New spin control value: ", str(spin_value)])
-        self.canvas.render(text)
+        # self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
 
@@ -479,7 +482,7 @@ class Gui(wx.Frame):
                     text = "Error! Invalid switch."
                     print(text)
         
-        self.canvas.render(text)
+        # self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
 
@@ -492,7 +495,7 @@ class Gui(wx.Frame):
         except:
             text = "Error! Could not zap monitor."
             print(text)
-            self.canvas.render(text)
+            # self.canvas.render(text)
             self.dialogue_box.write("{} \n".format(text))
             return False
 
@@ -547,7 +550,7 @@ class Gui(wx.Frame):
         except:
             text = "Error! Could not make monitor."
             print(text)
-            self.canvas.render(text)
+            # self.canvas.render(text)
             self.dialogue_box.write("{} \n".format(text))
             return False
 
@@ -602,22 +605,13 @@ class Gui(wx.Frame):
         sys.exit()
 
 
-    def on_reset_button(self, event):
+    def on_help_button(self, event):
         """Handle the event when the user clicks the reset button."""
         text = "reset button pressed."
 
-        # # reset all mouse parameters
-        
-        # self.pan_x = 0
-        # self.pan_y = 0
-        # self.last_mouse_x = 0
-        # self.last_mouse_y = 0
-
-        # # Initialise variables for zooming
-        # self.zoom = 1
-
         self.canvas.render(text)
-        self.dialogue_box.write("{} \n".format(text))
+
+        self.dialogue_box.write(self.help_text)
 
 
     def run_network(self, cycles):
@@ -631,7 +625,7 @@ class Gui(wx.Frame):
             else:
                 text = "Error! Network oscillating."
                 print(text)
-                self.canvas.render(text)
+                # self.canvas.render(text)
                 self.dialogue_box.write("{} \n".format(text))
                 return False
         self.monitors.display_signals()
