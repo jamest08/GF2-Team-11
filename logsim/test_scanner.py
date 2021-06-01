@@ -145,8 +145,6 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
         symbol_two = scanner_two.get_symbol()
         symbol_three = scanner_three.get_symbol()
 
-        print("ex. 2 id: {}, ex. 3 id: {}".format(symbol_two.id, symbol_three.id))
-
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
 
@@ -155,8 +153,6 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
     for i in range(6):
         symbol_two = scanner_two.get_symbol()
         symbol_three = scanner_three.get_symbol()
-
-        print("ex. 2 id: {}, ex. 3 id: {}".format(symbol_two.id, symbol_three.id))
 
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
@@ -181,7 +177,7 @@ def test_display_error_raises_exceptions(scanner_one):
     scanner = scanner_one
 
     with pytest.raises(TypeError):
-        var = scanner_one.display_error(12)
+        var = scanner.display_error(12)
 
 
 def test_display_error(scanner_one):
