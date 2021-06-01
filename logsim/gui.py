@@ -120,10 +120,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             self.render_text(monitor_name, x, y)
             margin = self.monitors.get_margin()
-            # print(margin)
 
             GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
             GL.glBegin(GL.GL_LINE_STRIP)
+
+            # draw signal according to list of states
 
             for i in range(len(signal_list)):
                 x = (i * 20) + 40 + margin*10
@@ -192,6 +193,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            if self.zoom < 1:
+                self.zoom = 1  # stop user zooming out so signals don't overlap.
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
@@ -332,13 +335,15 @@ class Gui(wx.Frame):
         self.help_button.Bind(wx.EVT_BUTTON, self.on_help_button)
 
         # Configure sizers for layout
+
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         side_sizer = wx.GridBagSizer(12, 4)
         main_sizer.Add(side_sizer, 1, wx.TOP | wx.LEFT, 5)
         main_sizer.AddSpacer(5)
         main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
 
-        # Canvas for drawing signals
+        # initialise canvas for drawing signals
+
         self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition,
                                  wx.Size(1000, 1000), devices, monitors)
         self.canvas.SetSizeHints(500, 500)
@@ -483,6 +488,8 @@ class Gui(wx.Frame):
             self.dialogue_box.write("{} \n".format(text))
             return False
 
+        # extract monitor's device and port IDs.
+
         device_name_list = []
         port_name_list = []
         is_device = True  # keep track of when '.' is hit.
@@ -504,6 +511,9 @@ class Gui(wx.Frame):
             port_id = self.names.query(port_name)
 
         monitor = [device_id, port_id]
+
+        # attempt to zap monitor once IDs have been found.
+
         if monitor is not None:
             [device, port] = monitor
             if self.monitors.remove_monitor(device, port):
@@ -515,6 +525,8 @@ class Gui(wx.Frame):
 
         self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
+
+        # reset lists available to add and zap monitors from
 
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
@@ -538,6 +550,8 @@ class Gui(wx.Frame):
             self.dialogue_box.write("{} \n".format(text))
             return False
 
+        # extract monitor's device and port IDs.
+
         device_name_list = []
         port_name_list = []
         is_device = True  # keep track of when '.' is hit.
@@ -560,6 +574,8 @@ class Gui(wx.Frame):
 
         monitor = [device_id, port_id]
 
+        # attempt to make monitor once IDs have been found.
+
         if monitor is not None:
             [device, port] = monitor
             monitor_error = self.monitors.make_monitor(device, port, self.cycles_completed)
@@ -570,8 +586,9 @@ class Gui(wx.Frame):
                 text = "Error! Could not make monitor."
                 print(text)
 
-        self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
+
+        # reset lists available to add and zap monitors from
 
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
@@ -590,8 +607,7 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the reset button."""
         text = "reset button pressed."
 
-        self.canvas.render(text)
-
+        self.dialogue_box.write("{} \n".format(text))
         self.dialogue_box.write(self.help_text)
 
     def run_network(self, cycles):
@@ -605,7 +621,6 @@ class Gui(wx.Frame):
             else:
                 text = "Error! Network oscillating."
                 print(text)
-                # self.canvas.render(text)
                 self.dialogue_box.write("{} \n".format(text))
                 return False
         self.monitors.display_signals()
