@@ -10,6 +10,7 @@ import os
 
 from names import Names
 from devices import Devices
+from devices import Device
 from network import Network
 from monitors import Monitors
 from scanner import Scanner
@@ -60,3 +61,48 @@ def test_continue_button(gui):
     assert gui.cycles_completed == 13
     assert len(signal_list) == 13
 
+
+def test_switches(gui):
+
+    gui.switches.SetSelection(0)
+    switch_id = gui.switches_id_list[0]
+    gui.switch_setting.SetSelection(1)
+    gui.on_switch_button(True)
+    gui.spin_value = 10
+    gui.on_run_button(True)  
+    lev = gui.network.get_output_signal(switch_id, None)
+
+    assert lev == 1
+
+    gui.switches.SetSelection(1)
+    switch_id = gui.switches_id_list[1]
+    gui.switch_setting.SetSelection(0)
+    gui.on_switch_button(True)
+    gui.spin_value = 10
+    gui.on_run_button(True)  
+    lev = gui.network.get_output_signal(switch_id, None)
+
+    assert lev == 0
+
+def test_monitor_changes(gui):
+    gui.monitored.SetSelection(0)
+    gui.on_zap_button(True)
+    assert len(gui.monitors.monitors_dictionary) == 1
+
+    gui.not_monitored.SetSelection(1)
+    gui.on_add_button(True)
+    assert len(gui.monitors.monitors_dictionary) == 2
+
+    switch_id = gui.switches_id_list[0]
+    assert (switch_id, None) in gui.monitors.monitors_dictionary
+
+def test_quit(gui):
+    with pytest.raises(SystemExit):
+            gui.on_quit_button(True)
+
+"""
+Manual Tests
+
+The window resizing and visual printing aspects of the gui have been visually testes by all members of the group
+"""
+    
