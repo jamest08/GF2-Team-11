@@ -144,17 +144,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             device_number += 1
 
-            # for i in range(10):
-            #     x = (i * 20) + 10
-            #     x_next = (i * 20) + 30
-            #     if i % 2 == 0:
-            #         y = 75
-            #     else:
-            #         y = 100
-            #     GL.glVertex2f(x, y)
-            #     GL.glVertex2f(x_next, y)
-            # GL.glEnd()
-
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
         GL.glFlush()
@@ -330,7 +319,6 @@ class Gui(wx.Frame):
 
         # Bind events to widgets
 
-        # self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
         self.Bind(wx.EVT_MENU, self.on_menu)
 
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
@@ -385,10 +373,6 @@ class Gui(wx.Frame):
         side_sizer.Add(self.quit_button, pos = (8, 0), span = (1, 1), flag = wx.BOTTOM, border = 5)
         side_sizer.Add(self.help_button, pos = (8, 1), span = (1, 1), flag = wx.BOTTOM, border = 5)
         side_sizer.Add(self.dialogue_box, pos = (9, 0), span = (3, 4), flag = wx.EXPAND, border = 5)
-
-
-        # side_sizer.Add(self.text_box, 1, wx.ALL, 5)
-        # side_sizer.Add(self.help_text, 10, wx.TOP, 10)
 
         self.SetSizeHints(600, 500) # minimum size of entire window
         self.SetSizer(main_sizer)
