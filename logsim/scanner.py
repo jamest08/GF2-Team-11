@@ -71,11 +71,13 @@ class Scanner:
             raise TypeError("names arguments not an instance of Names class")
 
         self.symbol_type_list = [self.FULLSTOP, self.SEMICOLON,
-                                 self.KEYWORD, self.NUMBER, self.NAME, self.INVALID, self.EOF] = range(7)
-        self.keywords_list = ["define", "connect", "monitor", 
-                              "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH", 
-                              "state", "NAND", "AND", "OR", "NOR", "inputs", 
-                              "period", "to", "Q", "QBAR", "DATA", "CLK", "SET", "CLEAR"]
+                                 self.KEYWORD, self.NUMBER, self.NAME,
+                                 self.INVALID, self.EOF] = range(7)
+        self.keywords_list = ["define", "connect", "monitor",
+                              "END", "as", "XOR", "DTYPE", "CLOCK", "SWITCH",
+                              "state", "NAND", "AND", "OR", "NOR", "inputs",
+                              "period", "to", "Q", "QBAR", "DATA", "CLK",
+                              "SET", "CLEAR"]
         [self.define_ID, self.connect_ID, self.monitor_ID,
             self.END_ID, self.as_ID, self.XOR_ID, self.DTYPE_ID,
             self.CLOCK_ID, self.SWITCH_ID, self.state_ID,
@@ -92,12 +94,11 @@ class Scanner:
         self.last_comment_pos = 0
         self.error_message_list = []
 
-
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
-        if self.current_character == "#":
+        if self.current_character == "#":  # comments skipped
             self.skip_comment()
             return self.get_symbol()
 
@@ -128,7 +129,7 @@ class Scanner:
             self.last_last_semicolon_pos = self.last_semicolon_pos
             self.last_semicolon_pos = self.file.tell()
 
-        elif self.current_character == "":
+        elif self.current_character == "":  # end of file character
             symbol.type = self.EOF
             [symbol.id] = self.names.lookup([""])
             symbol.pos = self.file.tell()
@@ -212,23 +213,22 @@ class Scanner:
     def skip_comment(self):
         """Skips comments enclosed in hashes."""
         z = self.file.read(1)
-        
-        end_of_file= False
+
+        end_of_file = False
         while z != "#" and end_of_file is False:
             z = self.file.read(1)
             if z == "":
                 end_of_file = True
 
-           
         self.last_comment_pos = self.file.tell()
         self.current_character = z
 
-    def display_error(self, error_message,caret=True):
+    def display_error(self, error_message, caret=True):
         """Display line of error and the error_message."""
         self.error_count += 1
         error_position = self.file.tell()
 
-        self.error_message_list.append(error_message) 
+        self.error_message_list.append(error_message)
         if self.last_semicolon_pos > self.last_comment_pos:
             if self.current_character == ';':
                 pos = self.last_last_semicolon_pos
@@ -247,12 +247,11 @@ class Scanner:
             self.skip_spaces()
             cur_pos = self.file.tell()
             self.file.seek(cur_pos-1, 0)
-            
 
         if type(error_message) != str:
             raise TypeError("Error message not a string")
         else:
-            if caret:
+            if caret:  # caret True when need error line to be printed
                 print(self.file.readline().strip())
                 print(" "*(difference-3), end='')
                 print("^")
