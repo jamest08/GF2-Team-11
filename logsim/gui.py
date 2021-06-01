@@ -78,7 +78,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.devices = devices
         self.monitors = monitors
 
-
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -93,7 +92,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
-
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -136,7 +134,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                     y = 100 + device_number*50
                 elif signal_list[i] == self.devices.BLANK:
                     y = 0
-                
+
                 if y != 0:
                     GL.glVertex2f(x, y)
                     GL.glVertex2f(x_next, y)
@@ -247,7 +245,7 @@ class Gui(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(600, 500)) # size of entire window at beginning
+        super().__init__(parent=None, title=title, size=(600, 500))  # size of entire window at beginning
 
         # Configure the file menu
 
@@ -258,14 +256,12 @@ class Gui(wx.Frame):
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
-        print(menuBar.GetMenu(0).GetTitle())
-        menuBar.EnableTop(0,True)
 
         # set scrollable area for canvas
 
         self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
-        self.scrollable.SetSizeHints(500, 500)  #!!!! what is this doing
-        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS,wx.SHOW_SB_DEFAULT)
+        self.scrollable.SetSizeHints(500, 500)
+        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
 
         # Declare "run simulation items"
 
@@ -285,8 +281,8 @@ class Gui(wx.Frame):
             name = names.get_name_string(id)
             self.switches_list.append(name)
 
-        self.switches = wx.Choice(self, wx.ID_ANY, choices = self.switches_list)
-        self.switch_setting = wx.Choice(self, wx.ID_ANY, choices = ["0", "1"])
+        self.switches = wx.Choice(self, wx.ID_ANY, choices=self.switches_list)
+        self.switch_setting = wx.Choice(self, wx.ID_ANY, choices=["0", "1"])
         self.switch_button = wx.Button(self, wx.ID_ANY, "Switch")
 
         # Declare "manage monitors items"
@@ -296,18 +292,18 @@ class Gui(wx.Frame):
         self.monitored_list = monitors.get_signal_names()[0]
         self.unmonitored_list = monitors.get_signal_names()[1]
 
-        self.monitored = wx.Choice(self, wx.ID_ANY, choices = self.monitored_list)
-        self.not_monitored = wx.Choice(self, wx.ID_ANY, choices = self.unmonitored_list)
+        self.monitored = wx.Choice(self, wx.ID_ANY, choices=self.monitored_list)
+        self.not_monitored = wx.Choice(self, wx.ID_ANY, choices=self.unmonitored_list)
 
         self.zap_monitor_button = wx.Button(self, wx.ID_ANY, "Zap")
         self.add_monitor_button = wx.Button(self, wx.ID_ANY, "Add")
-        
+
         # declare bottom items
 
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.help_button = wx.Button(self, wx.ID_ANY, "Help")
 
-        self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "", style = wx.TE_MULTILINE|wx.TE_READONLY)
+        self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
 
         self.help_text = """HELP MENU: \n
         To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
@@ -330,51 +326,48 @@ class Gui(wx.Frame):
         self.quit_button.Bind(wx.EVT_BUTTON, self.on_quit_button)
         self.help_button.Bind(wx.EVT_BUTTON, self.on_help_button)
 
-        '''need to add binds to new features'''
-
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         side_sizer = wx.GridBagSizer(12, 4)
-        main_sizer.Add(side_sizer, 1, wx.TOP|wx.LEFT, 5)
+        main_sizer.Add(side_sizer, 1, wx.TOP | wx.LEFT, 5)
         main_sizer.AddSpacer(5)
         main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
 
         # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition,  
-        wx.Size(1000, 1000), devices, monitors) # size of canvas
+        self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition, wx.Size(1000, 1000), devices, monitors)
         self.canvas.SetSizeHints(500, 500)
         self.scrollable.SetScrollbars(20, 20, 50, 50)
         self.scrollable.Scroll(0, 50)
 
         # place "run simulation" items
 
-        side_sizer.Add(self.run_text, pos = (0, 0), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.spin, pos = (1, 0), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.run_button, pos = (1, 1), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.continue_button, pos = (1, 2), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.run_text, pos=(0, 0), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.spin, pos=(1, 0), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.run_button, pos=(1, 1), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.continue_button, pos=(1, 2), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
 
         # place "manage switches" items
 
-        side_sizer.Add(self.switches_text, pos = (2, 0), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.switches, pos = (3, 0), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.switch_setting, pos = (3, 1), span = (1, 1), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.switch_button, pos = (3, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.switches_text, pos=(2, 0), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.switches, pos=(3, 0), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.switch_setting, pos=(3, 1), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.switch_button, pos=(3, 2), flag=wx.TOP | wx.EXPAND, border=5)
 
         # place "manage monitors" items
 
-        side_sizer.Add(self.monitors_text, pos = (4, 0), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.monitored, pos = (5, 0), span = (1, 2), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.zap_monitor_button, pos = (5, 2), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.not_monitored, pos = (6, 0), span = (1, 2), flag = wx.TOP|wx.EXPAND, border = 5)
-        side_sizer.Add(self.add_monitor_button, pos = (6, 2), flag = wx.TOP|wx.EXPAND, border = 5)
+        side_sizer.Add(self.monitors_text, pos=(4, 0), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.monitored, pos=(5, 0), span=(1, 2), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.zap_monitor_button, pos=(5, 2), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.not_monitored, pos=(6, 0), span=(1, 2), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.add_monitor_button, pos=(6, 2), flag=wx.TOP | wx.EXPAND, border=5)
 
         # place bottom items
 
-        side_sizer.Add(self.quit_button, pos = (8, 0), span = (1, 1), flag = wx.BOTTOM, border = 5)
-        side_sizer.Add(self.help_button, pos = (8, 1), span = (1, 1), flag = wx.BOTTOM, border = 5)
-        side_sizer.Add(self.dialogue_box, pos = (9, 0), span = (3, 4), flag = wx.EXPAND, border = 5)
+        side_sizer.Add(self.quit_button, pos=(8, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
+        side_sizer.Add(self.help_button, pos=(8, 1), span=(1, 1), flag=wx.BOTTOM, border=5)
+        side_sizer.Add(self.dialogue_box, pos=(9, 0), span=(3, 4), flag=wx.EXPAND, border=5)
 
-        self.SetSizeHints(600, 500) # minimum size of entire window
+        self.SetSizeHints(600, 500)  # minimum size of entire window
         self.SetSizer(main_sizer)
 
         # variables from userint
@@ -392,7 +385,6 @@ class Gui(wx.Frame):
 
         self.start_view = 0
 
-
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         print("menu button pressed")
@@ -403,20 +395,18 @@ class Gui(wx.Frame):
             wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
 
-
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
         spin_value = self.spin.GetValue()
         self.spin_value = spin_value
         text = "".join(["New spin control value: ", str(spin_value)])
-        # self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
-
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button.
-        Run the simulation from scratch."""
 
+        Run the simulation from scratch.
+        """
         self.cycles_completed = 0
         cycles = self.spin_value
 
@@ -427,15 +417,15 @@ class Gui(wx.Frame):
             self.devices.cold_startup()
             if self.run_network(cycles):
                 self.cycles_completed += cycles
-        
+
         self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
-
     def on_continue_button(self, event):
         """Handle the event when the user clicks the continue button.
-        Continue a previously run simulation."""
 
+        Continue a previously run simulation.
+        """
         cycles = self.spin_value
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
@@ -446,15 +436,15 @@ class Gui(wx.Frame):
                 text = " ".join(["Continuing for", str(cycles), "cycles.",
                                 "Total:", str(self.cycles_completed)])
                 print(text)
-        
+
         self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
-
     def on_switch_button(self, event):
         """Handle the event when the user clicks the switch button.
-        Set the specified switch to the specified signal level."""
-        
+
+        Set the specified switch to the specified signal level.
+        """
         switch_index = self.switches.GetSelection()
         switch_id = self.switches_id_list[switch_index]
 
@@ -468,27 +458,25 @@ class Gui(wx.Frame):
                 else:
                     text = "Error! Invalid switch."
                     print(text)
-        
-        # self.canvas.render(text)
-        self.dialogue_box.write("{} \n".format(text))
 
+        self.dialogue_box.write("{} \n".format(text))
 
     def on_zap_button(self, event):
         """Handle the event when the user clicks the run button.
-        Remove the specified monitor."""
 
-        try: 
+        Remove the specified monitor.
+        """
+        try:
             monitor_name = self.monitored.GetString(self.monitored.GetSelection())
-        except:
+        except Exception:
             text = "Error! Could not zap monitor."
             print(text)
-            # self.canvas.render(text)
             self.dialogue_box.write("{} \n".format(text))
             return False
 
         device_name_list = []
         port_name_list = []
-        is_device = True # keep track of when '.' is hit.
+        is_device = True  # keep track of when '.' is hit.
         for i in monitor_name:
             if i.isalnum() is True and is_device is True:
                 device_name_list.append(i)
@@ -496,7 +484,7 @@ class Gui(wx.Frame):
                 port_name_list.append(i)
             else:
                 is_device = 0
-        
+
         device_name = ''.join(device_name_list)
         port_name = ''.join(port_name_list)
 
@@ -515,7 +503,7 @@ class Gui(wx.Frame):
             else:
                 text = "Error! Could not zap monitor."
                 print(text)
-    
+
         self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
@@ -527,14 +515,14 @@ class Gui(wx.Frame):
         self.unmonitored_list = self.monitors.get_signal_names()[1]
         self.not_monitored.SetItems(self.unmonitored_list)
 
-
     def on_add_button(self, event):
         """Handle the event when the user clicks the run button.
-        Set the specified monitor."""
 
+        Set the specified monitor.
+        """
         try:
             monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
-        except:
+        except Exception:
             text = "Error! Could not make monitor."
             print(text)
             # self.canvas.render(text)
@@ -543,7 +531,7 @@ class Gui(wx.Frame):
 
         device_name_list = []
         port_name_list = []
-        is_device = True # keep track of when '.' is hit.
+        is_device = True  # keep track of when '.' is hit.
         for i in monitor_name:
             if i.isalnum() is True and is_device is True:
                 device_name_list.append(i)
@@ -551,7 +539,7 @@ class Gui(wx.Frame):
                 port_name_list.append(i)
             else:
                 is_device = 0
-        
+
         device_name = ''.join(device_name_list)
         port_name = ''.join(port_name_list)
 
@@ -562,18 +550,17 @@ class Gui(wx.Frame):
             port_id = self.names.query(port_name)
 
         monitor = [device_id, port_id]
-        
+
         if monitor is not None:
             [device, port] = monitor
-            monitor_error = self.monitors.make_monitor(device, port,
-                                                       self.cycles_completed)
+            monitor_error = self.monitors.make_monitor(device, port, self.cycles_completed)
             if monitor_error == self.monitors.NO_ERROR:
                 text = "Successfully made monitor."
                 print(text)
             else:
                 text = "Error! Could not make monitor."
                 print(text)
-        
+
         self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
@@ -585,12 +572,10 @@ class Gui(wx.Frame):
         self.unmonitored_list = self.monitors.get_signal_names()[1]
         self.not_monitored.SetItems(self.unmonitored_list)
 
-
     def on_quit_button(self, event):
         """Handle the event when the user clicks the quit button."""
         print("quitting program")
         sys.exit()
-
 
     def on_help_button(self, event):
         """Handle the event when the user clicks the reset button."""
@@ -599,7 +584,6 @@ class Gui(wx.Frame):
         self.canvas.render(text)
 
         self.dialogue_box.write(self.help_text)
-
 
     def run_network(self, cycles):
         """Run the network for the specified number of simulation cycles.
