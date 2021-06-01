@@ -100,14 +100,3 @@ class Names:
                 return None
         else:
             raise TypeError("Expected name_id to be integer.")
-
-
-"""quick tests
-names = Names()
-print(names.lookup(['144', 'hello', 'james', '144']))
-print(names.lookup(['144', '6']))
-print(names.query('james'))
-print(names.query(' '))
-print(names.get_name_string(3))
-print(names.names_list)
-"""
