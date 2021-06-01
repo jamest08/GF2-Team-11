@@ -1,0 +1,16 @@
+define X1 X2 as XOR;
+define A1 A2 as AND 2 inputs;
+define O1 as OR 2 inputs;
+define A B Ci as SWITCH 0 state;
+connect A to X1.I1;
+connect B to X1.I2;
+connect Ci to X2.I1;
+connect X1 to X2.I2;
+connect A to A1.I1;
+connect B to A1.I2;
+connect Ci to A2.I1;
+connect X1 to A2.I2.
+connect A1 to O1.I1;
+connect A2 to O1.I2;
+monitor X2 O1;
+END
