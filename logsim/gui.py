@@ -245,7 +245,7 @@ class Gui(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(600, 500))  # size of entire window at beginning
+        super().__init__(parent=None, title=title, size=(600, 500))
 
         # Configure the file menu
 
@@ -303,14 +303,19 @@ class Gui(wx.Frame):
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.help_button = wx.Button(self, wx.ID_ANY, "Help")
 
-        self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "",
+                                        style=wx.TE_MULTILINE | wx.TE_READONLY)
 
         self.help_text = """HELP MENU: \n
         To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
-        To continue the simulation for N cycles, select N with the scroll menu and click 'Continue'. \n
-        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu and a state for the switch to be in. Then click 'Switch'. \n
-        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu and click 'Zap'. \n
-        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu and click 'Add'. \n
+        To continue the simulation for N cycles, select N with the scroll menu.
+        Then click 'Continue'. \n
+        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.
+        Then select a state for the switch to be in. Then click 'Switch'. \n
+        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.
+        Then click 'Zap'. \n
+        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.
+        Then click 'Add'. \n
         To quit the program, click quit. """
 
         # Bind events to widgets
@@ -334,7 +339,8 @@ class Gui(wx.Frame):
         main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
 
         # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition, wx.Size(1000, 1000), devices, monitors)
+        self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition,
+                                 wx.Size(1000, 1000), devices, monitors)
         self.canvas.SetSizeHints(500, 500)
         self.scrollable.SetScrollbars(20, 20, 50, 50)
         self.scrollable.Scroll(0, 50)
@@ -344,13 +350,15 @@ class Gui(wx.Frame):
         side_sizer.Add(self.run_text, pos=(0, 0), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.spin, pos=(1, 0), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.run_button, pos=(1, 1), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
-        side_sizer.Add(self.continue_button, pos=(1, 2), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.continue_button, pos=(1, 2),
+                       span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
 
         # place "manage switches" items
 
         side_sizer.Add(self.switches_text, pos=(2, 0), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.switches, pos=(3, 0), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
-        side_sizer.Add(self.switch_setting, pos=(3, 1), span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.switch_setting, pos=(3, 1),
+                       span=(1, 1), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.switch_button, pos=(3, 2), flag=wx.TOP | wx.EXPAND, border=5)
 
         # place "manage monitors" items
@@ -358,7 +366,8 @@ class Gui(wx.Frame):
         side_sizer.Add(self.monitors_text, pos=(4, 0), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.monitored, pos=(5, 0), span=(1, 2), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.zap_monitor_button, pos=(5, 2), flag=wx.TOP | wx.EXPAND, border=5)
-        side_sizer.Add(self.not_monitored, pos=(6, 0), span=(1, 2), flag=wx.TOP | wx.EXPAND, border=5)
+        side_sizer.Add(self.not_monitored, pos=(6, 0),
+                       span=(1, 2), flag=wx.TOP | wx.EXPAND, border=5)
         side_sizer.Add(self.add_monitor_button, pos=(6, 2), flag=wx.TOP | wx.EXPAND, border=5)
 
         # place bottom items
