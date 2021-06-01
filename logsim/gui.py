@@ -193,8 +193,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
-            if self.zoom < 1:
-                self.zoom = 1  # stop user zooming out so signals don't overlap.
+            if self.zoom < 0.65:
+                self.zoom = 0.65  # stop user zooming out so signals don't overlap.
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
