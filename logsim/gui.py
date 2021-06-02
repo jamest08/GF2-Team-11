@@ -248,7 +248,7 @@ class Gui(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(600, 500))
+        super().__init__(parent=None, title=title, size=(600, 530))
 
         # Configure the file menu
 
@@ -263,7 +263,7 @@ class Gui(wx.Frame):
         # set scrollable area for canvas
 
         self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
-        self.scrollable.SetSizeHints(500, 500)
+        self.scrollable.SetSizeHints(800, 1000)
         self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
 
         # Declare "run simulation items"
@@ -366,6 +366,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         side_sizer = wx.GridBagSizer(14, 4)
         side_sizer.AddGrowableCol(0)
+        side_sizer.AddGrowableRow(11)
         main_sizer.Add(side_sizer, 1, wx.TOP | wx.LEFT | wx.EXPAND, 5)
         main_sizer.AddSpacer(5)
         main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
@@ -405,11 +406,11 @@ monitor = “monitor”, output, {output}, “;” ;"""
 
         # place bottom items
 
-        side_sizer.Add(self.quit_button, pos=(8, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
-        side_sizer.Add(self.help_button, pos=(8, 2), span=(1, 1), flag=wx.LEFT, border=5)
-        side_sizer.Add(self.dialogue_box, pos=(9, 0), span=(5, 4), flag=wx.EXPAND, border=5)
+        side_sizer.Add(self.quit_button, pos=(13, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
+        side_sizer.Add(self.help_button, pos=(13, 2), span=(1, 1), flag=wx.LEFT, border=5)
+        side_sizer.Add(self.dialogue_box, pos=(8, 0), span=(5, 4), flag=wx.EXPAND, border=5)
 
-        self.SetSizeHints(600, 500)  # minimum size of entire window
+        self.SetSizeHints(600, 530)  # minimum size of entire window
         self.SetSizer(main_sizer)
 
         # variables from userint
