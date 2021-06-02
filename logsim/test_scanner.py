@@ -136,8 +136,8 @@ def test_get_symbol_example_two(scanner_two):
     assert symbol.type == scanner.SEMICOLON
 
 
-def test_get_symbol_example_three(scanner_two, scanner_three):
-    """Test if get_symbol produces the correct output for example file 3"""
+def test_get_symbol_for_comments(scanner_two, scanner_three):
+    """Test if get_symbol produces the correct output for file with comments"""
 
     # checking if single line comment is ignored
 
@@ -157,11 +157,37 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
 
-    # checking if paragraph comment is ignored
+    assert symbol_three.type == scanner_three.SEMICOLON
 
-    for i in range(68):
+    # check many spaces in a row are handled properly
+
+    for i in range(42):
         symbol_two = scanner_two.get_symbol()
         symbol_three = scanner_three.get_symbol()
+
+    for i in range(7):
+        symbol_two = scanner_two.get_symbol()
+        symbol_three = scanner_three.get_symbol()
+
+        assert symbol_two.type == symbol_three.type
+        assert symbol_two.id == symbol_three.id
+
+    assert symbol_three.type == scanner_three.SEMICOLON
+
+    # checking if paragraph comment is ignored
+
+    for i in range(27):
+        symbol_two = scanner_two.get_symbol()
+        symbol_three = scanner_three.get_symbol()
+
+    for i in range(3):
+        symbol_two = scanner_two.get_symbol()
+        symbol_three = scanner_three.get_symbol()
+
+        assert symbol_two.type == symbol_three.type
+        assert symbol_two.id == symbol_three.id
+
+    # checking if back to back comments are ignored
 
     for i in range(5):
         symbol_two = scanner_two.get_symbol()
@@ -169,6 +195,8 @@ def test_get_symbol_example_three(scanner_two, scanner_three):
 
         assert symbol_two.type == symbol_three.type
         assert symbol_two.id == symbol_three.id
+
+    assert symbol_three.type == scanner_three.FULLSTOP
 
 
 def test_display_error_raises_exceptions(scanner_one):
