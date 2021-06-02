@@ -605,7 +605,7 @@ class Gui(wx.Frame):
 
     def on_help_button(self, event):
         """Handle the event when the user clicks the reset button."""
-        text = "reset button pressed."
+        text = "Help button pressed."
 
         self.dialogue_box.write("{} \n".format(text))
         self.dialogue_box.write(self.help_text)
