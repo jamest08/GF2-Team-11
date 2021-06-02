@@ -21,7 +21,7 @@ def parser():
     cwd = os.getcwd()
 
     file_list = ["example1.txt", "example1_with_syntax_errors.txt",
-                 "example5_rubbish.txt", "example4.txt"]
+                 "error2.txt", "error1.txt"]
     parser_list = []
     for item in file_list:
         if '/' in cwd:
