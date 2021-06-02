@@ -105,7 +105,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
         # Draw specified text at position (10, 10)
-        self.render_text(text, 10, 10)
+        self.render_text(text, 10, 50)
 
         # get list of signals for a single monitor
 
