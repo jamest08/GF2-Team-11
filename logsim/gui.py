@@ -337,8 +337,9 @@ class Gui(wx.Frame):
         # Configure sizers for layout
 
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.GridBagSizer(12, 4)
-        main_sizer.Add(side_sizer, 1, wx.TOP | wx.LEFT, 5)
+        side_sizer = wx.GridBagSizer(14, 4)
+        side_sizer.AddGrowableCol(0)
+        main_sizer.Add(side_sizer, 1, wx.TOP | wx.LEFT | wx.EXPAND, 5)
         main_sizer.AddSpacer(5)
         main_sizer.Add(self.scrollable, 1, wx.TOP, 5)
 
@@ -378,8 +379,8 @@ class Gui(wx.Frame):
         # place bottom items
 
         side_sizer.Add(self.quit_button, pos=(8, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
-        side_sizer.Add(self.help_button, pos=(8, 1), span=(1, 1), flag=wx.BOTTOM, border=5)
-        side_sizer.Add(self.dialogue_box, pos=(9, 0), span=(3, 4), flag=wx.EXPAND, border=5)
+        side_sizer.Add(self.help_button, pos=(8, 2), span=(1, 1), flag=wx.LEFT, border=5)
+        side_sizer.Add(self.dialogue_box, pos=(9, 0), span=(5, 4), flag=wx.EXPAND, border=5)
 
         self.SetSizeHints(600, 500)  # minimum size of entire window
         self.SetSizer(main_sizer)
@@ -607,7 +608,7 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the reset button."""
         text = "Help button pressed."
 
-        self.dialogue_box.write("{} \n".format(text))
+        self.dialogue_box.write("{} \n \n".format(text))
         self.dialogue_box.write(self.help_text)
 
     def run_network(self, cycles):
