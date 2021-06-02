@@ -638,7 +638,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         text = "Help button pressed."
 
         self.dialogue_box.write("{} \n \n".format(text))
-        self.dialogue_box.write(self.help_text)
+        self.dialogue_box.write("{} \n \n".format(self.help_text))
 
     def run_network(self, cycles):
         """Run the network for the specified number of simulation cycles.
