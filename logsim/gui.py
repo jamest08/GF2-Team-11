@@ -87,7 +87,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        GL.glOrtho(0, size.width, 0, size.height, -1, 1)
+        GL.glOrtho(0, size.width, size.height, 0, -1, 1)
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
@@ -130,9 +130,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 x = (i * 20) + 40 + margin*10
                 x_next = (i * 20) + 60 + margin*10
                 if signal_list[i] == self.devices.LOW:
-                    y = 75 + device_number*50
-                elif signal_list[i] == self.devices.HIGH:
                     y = 100 + device_number*50
+                elif signal_list[i] == self.devices.HIGH:
+                    y = 75 + device_number*50
                 elif signal_list[i] == self.devices.BLANK:
                     y = 0
 
@@ -172,7 +172,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         text = ""
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
-            self.last_mouse_y = event.GetY()
+            self.last_mouse_y = -event.GetY()
             text = "".join(["Mouse button pressed at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
         if event.ButtonUp():
@@ -183,9 +183,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                             ", ", str(event.GetY())])
         if event.Dragging():
             self.pan_x += event.GetX() - self.last_mouse_x
-            self.pan_y -= event.GetY() - self.last_mouse_y
+            self.pan_y -= -event.GetY() - self.last_mouse_y
             self.last_mouse_x = event.GetX()
-            self.last_mouse_y = event.GetY()
+            self.last_mouse_y = -event.GetY()
             self.init = False
             text = "".join(["Mouse dragged to: ", str(event.GetX()),
                             ", ", str(event.GetY()), ". Pan is now: ",
@@ -377,7 +377,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
                                  wx.Size(1000, 1000), devices, monitors)
         self.canvas.SetSizeHints(500, 500)
         self.scrollable.SetScrollbars(20, 20, 50, 50)
-        self.scrollable.Scroll(0, 50)
+        self.scrollable.Scroll(0, 0)
 
         # place "run simulation" items
 
@@ -616,6 +616,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
                 text = "Error! Could not make monitor."
                 print(text)
 
+        self.canvas.render(text)
         self.dialogue_box.write("{} \n".format(text))
 
         # reset lists available to add and zap monitors from
