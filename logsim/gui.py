@@ -321,6 +321,33 @@ class Gui(wx.Frame):
         Then click 'Add'. \n
         To quit the program, click quit. """
 
+        self.EBNF_text = """EBNF RULES:
+
+digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
+
+letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       | "x" | "y" | "z" ;
+
+file = {definition | connection | monitor}, "END" ;
+
+definition =  “define”, name, {name}, “as”, (“XOR” | “DTYPE” | switch | gate | clock), “;” ;
+switch = “SWITCH”, (“0” | “1”), “state” ;
+gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
+clock = “CLOCK”, “period”, digit, {digit} ;
+name = letter, {letter | digit} ;
+
+connection = “connect”, output, “to”, input, “;” ;
+output = name, [“.Q” | “.QBAR”] ;
+input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
+
+monitor = “monitor”, output, {output}, “;” ;"""
+
         # Bind events to widgets
 
         self.Bind(wx.EVT_MENU, self.on_menu)
@@ -407,35 +434,9 @@ class Gui(wx.Frame):
         if Id == wx.ID_EXIT:
             self.Close(True)
         if Id == wx.ID_ABOUT:
-            wx.MessageBox("""EBNF RULES:
-
-digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
-
-letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
-       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
-       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
-       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
-       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
-       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
-       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
-       | "x" | "y" | "z" ;
-
-file = {definition | connection | monitor}, "END" ;
-
-definition =  “define”, name, {name}, “as”, (“XOR” | “DTYPE” | switch | gate | clock), “;” ;
-switch = “SWITCH”, (“0” | “1”), “state” ;
-gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
-clock = “CLOCK”, “period”, digit, {digit} ;
-name = letter, {letter | digit} ;
-
-connection = “connect”, output, “to”, input, “;” ;
-output = name, [“.Q” | “.QBAR”] ;
-input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
-
-monitor = “monitor”, output, {output}, “;” ;
-                          """,
-                          "Rules for the user definition file."
-                          , wx.ICON_INFORMATION | wx.OK)
+            wx.MessageBox(self.EBNF_text,
+                          "Rules for the user definition file.",
+                          wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
