@@ -191,7 +191,11 @@ class Parser:
                                         self.names.query('OR'), self.names.query('NOR')]:
             gate_id = self.current_symbol.id
             self.current_symbol = self.scanner.get_symbol()
-            num_inputs = int(self.names.get_name_string(self.current_symbol.id))
+            try:
+                num_inputs = int(self.names.get_name_string(self.current_symbol.id))
+            except Exception:
+                self.scanner.display_error("Expected integer number of inputs.")
+                return False
             self.current_symbol = self.scanner.get_symbol()
             if self.current_symbol.id != self.names.query('inputs'):
                 self.scanner.display_error("Expected keyword 'inputs'")
