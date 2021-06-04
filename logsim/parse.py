@@ -237,7 +237,8 @@ class Parser:
             waveform = []
             self.current_symbol = self.scanner.get_symbol()
             while self.current_symbol.id != self.names.query('waveform'):
-                if self.current_symbol.id != self.names.query('0') and self.current_symbol.id != self.names.query('1'):
+                if (self.current_symbol.id != self.names.query('0')
+                   and self.current_symbol.id != self.names.query('1')):
                     self.scanner.display_error("Expected 0 or 1 or keyword 'waveform'")
                     return False
                 level = int(self.names.get_name_string(self.current_symbol.id))
@@ -246,7 +247,7 @@ class Parser:
                     self.scanner.display_error("Expected keyword 'for'")
                     return False
                 self.current_symbol = self.scanner.get_symbol()
-                try: #check semantic error, not zero
+                try:  # check semantic error, not zero
                     multiple = int(self.names.get_name_string(self.current_symbol.id))
                 except Exception:
                     self.scanner.display_error("Expected integer number of cycles")
@@ -262,14 +263,13 @@ class Parser:
                 definition_complete = True  # at least one iteration defined so can build waveform
                 self.current_symbol = self.scanner.get_symbol()
             if not definition_complete:  # 'waveform' appears prematurely
-                self.scanner.display_error("Require waveform definition before keyword 'waveform'") 
+                self.scanner.display_error("Require waveform definition before keyword 'waveform'")
                 return False
             if waveform == []:
                 self.scanner.display_error("Blank waveform received")
                 return False
             for name_id in name_ids:
                 self.devices.make_device(name_id, self.devices.SIGGEN, waveform)
-            
 
         else:
             self.scanner.display_error('Expected device type')

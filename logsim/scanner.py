@@ -197,18 +197,18 @@ class Scanner:
 
         if z.isdigit() is True:
 
-                number.append(z)
+            number.append(z)
+            prev_char_pos = self.file.tell()
+            nextnum = self.file.read(1)
+
+            while nextnum.isdigit() is True:
+                number.append(nextnum)
                 prev_char_pos = self.file.tell()
                 nextnum = self.file.read(1)
 
-                while nextnum.isdigit() is True:
-                    number.append(nextnum)
-                    prev_char_pos = self.file.tell()
-                    nextnum = self.file.read(1)
-
-                n = ''.join(number)
-                self.file.seek(prev_char_pos)
-                return(n)
+            n = ''.join(number)
+            self.file.seek(prev_char_pos)
+            return(n)
 
     def skip_comment(self):
         """Skips comments enclosed in hashes."""

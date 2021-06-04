@@ -47,10 +47,6 @@ def main(arg_list):
     devices = Devices(names)
     network = Network(names, devices)
     monitors = Monitors(names, devices, network)
-    #names = None
-    #devices = None
-    #network = None
-    #monitors = None
 
     for option, path in options:
         if option == "-h":  # print the usage message

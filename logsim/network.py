@@ -9,7 +9,6 @@ Network - builds and executes the network.
 
 
 class Network:
-
     """Build and execute the network.
 
     This class contains many functions required for connecting devices together
@@ -301,7 +300,7 @@ class Network:
         device.outputs[self.devices.Q_ID] = new_Q
         device.outputs[self.devices.QBAR_ID] = new_QBAR
 
-        return True      
+        return True
 
     def execute_clock_siggen(self, device_id):
         """Simulate a clock/sig. gen. and update its output signal value.
