@@ -1,0 +1,20 @@
+#define CL1 as CLOCK period 2 ; #defining clock#
+define SW1 as #comment# SWITCH 0 state;
+define SW2 as SWITCH 0 state;
+define D1 D2 D3 as DTYPE;
+connect SW1 to D1.SET;
+connect SW2 to D1.CLEAR;
+connect SW1 to D2.SET;
+connect SW2 to D2.CLEAR;
+connect SW1         to D3.SET;
+connect SW2 to D3.CLEAR;
+connect CL1 to D1.CLK;
+connect D1.Q to D2.CLK;
+connect D2.Q to D3.CLK;#paragraph
+comment
+#
+connect D1.QBAR #back to back# #comments# to D1.DATA;
+connect D2.QBAR to D2.DATA;
+connect D3.QBAR to D3.DATA;
+monitor D1.Q D2.Q D3.Q;
+END#
