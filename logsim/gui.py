@@ -9,9 +9,9 @@ MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
 import wx
-from wx.core import BoxSizer
+from wx.core import BoxSizer, LANGUAGE_JAPANESE
 import wx.glcanvas as wxcanvas
-import wx.lib.sized_controls as sc
+import builtins
 from OpenGL import GL, GLUT
 
 
@@ -252,11 +252,11 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(600, 530))
 
-        mylocale= wx.Locale()
+        mylocale = wx.Locale()
         mylocale.AddCatalogLookupPathPrefix('.')
-        mylocale.AddCatalog('simple_ja')
+        mylocale.AddCatalog('jap')
 
-        _= wx.GetTranslation
+        builtins.__dict__['_'] = wx.GetTranslation
 
         # Configure the file menu
 
@@ -664,3 +664,33 @@ monitor = “monitor”, output, {output}, “;” ;"""
                 return False
         self.monitors.display_signals()
         return True
+
+    def updateLanguage(self, lang):
+        """
+        Update the language to the requested one.
+
+        Make *sure* any existing locale is deleted before the new
+        one is created.  The old C++ object needs to be deleted
+        before the new one is created, and if we just assign a new
+        instance to the old Python variable, the old C++ locale will
+        not be destroyed soon enough, likely causing a crash.
+
+        :param string `lang`: one of the supported language codes
+
+        """
+        # if an unsupported language is requested default to English
+        if lang == "ja_JP.UTF-8":
+            selLang = wx.LANGUAGE_JAPANESE
+        else:
+            selLang = wx.LANGUAGE_ENGLISH
+
+        if self.locale:
+            assert sys.getrefcount(self.locale) <= 2
+            del self.locale
+
+        # create a locale object for this language
+        self.locale = wx.Locale(selLang)
+        if self.locale.IsOk():
+            self.locale.AddCatalog("jap")
+        else:
+            self.locale = None
