@@ -171,13 +171,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glEnable(GL.GL_NORMALIZE)
 
         # Viewing transformation - set the viewpoint back from the scene
+        # Translate the waveforms to start in the top left hand corner
+
         GL.glTranslatef(-350, 350, -self.depth_offset)
+
+        # rotate the waveforms to start a viewable angle
 
         x = 40
         y = 40
         GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
 
         # Modelling transformation - pan, zoom and rotate
+
         GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
         GL.glMultMatrixf(self.scene_rotate)
         GL.glScalef(self.zoom, self.zoom, self.zoom)
@@ -203,6 +208,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # get list of signals for a single monitor
 
         device_number = 0
+        signal_list_length = 0
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
@@ -219,7 +225,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             # draw signal according to list of states
 
-            for i in range(len(signal_list)):
+            signal_list_length = len(signal_list)
+
+            for i in range(signal_list_length):
                 x = (i * 20) + 40 + margin*10
                 x_next = (i * 20) + 60 + margin*10
                 if signal_list[i] == self.devices.LOW:
@@ -229,12 +237,24 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 elif signal_list[i] == self.devices.BLANK:
                     y = 0
 
+                # keep waveforms for monitor points added after
+                # first cycles blank until point of addition
+
                 if y != 0:
                     GL.glVertex2f(x, y)
                     GL.glVertex2f(x_next, y)
             GL.glEnd()
 
             device_number += 1
+        
+        # draw x axis
+
+        x = 10
+        y = 85 + (device_number)*50
+        for i in range(signal_list_length):
+            x = (i * 20) + 40 + margin*10
+            x_next = (i * 20) + 60 + margin*10
+            self.render_text_2D(str(i), x, y)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -255,13 +275,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             x = device_number * 20
 
+            GL.glColor3f(1, 1, 1)  # text in white
+
             self.render_text_3D(monitor_name, x, 0, 0)
 
             GL.glColor3f(0.7, 0.2, 1)  # signal trace is purple
 
             # draw signal according to list of states
 
-            for i in range(len(signal_list)):
+            signal_list_length = len(signal_list)
+
+            for i in range(signal_list_length):
                 z = i * 20
                 if signal_list[i] == self.devices.LOW:
                     self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 1)
@@ -269,6 +293,16 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                     self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 11)
 
             device_number += 1
+        
+        # draw axis for number of cycles.
+
+        x = -20
+
+        for i in range(signal_list_length):
+            GL.glColor3f(1, 1, 1)  # text in white
+            z = i * 20
+            self.render_text_3D(str(i), x, 0, z + 10 + margin*10)
+
 
 
         # We have been drawing to the back buffer, flush the graphics pipeline
