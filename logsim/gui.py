@@ -274,11 +274,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
 
             x = device_number * 20
-
-            GL.glColor3f(1, 1, 1)  # text in white
-
             self.render_text_3D(monitor_name, x, 0, 0)
-
             GL.glColor3f(0.7, 0.2, 1)  # signal trace is purple
 
             # draw signal according to list of states
@@ -296,14 +292,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         
         # draw axis for number of cycles.
 
-        x = -20
-
         for i in range(signal_list_length):
-            GL.glColor3f(1, 1, 1)  # text in white
             z = i * 20
-            self.render_text_3D(str(i), x, 0, z + 10 + margin*10)
-
-
+            self.render_text_3D(str(i), -20, 0, z + 10 + margin*10)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -468,6 +459,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_text_3D(self, text, x_pos, y_pos, z_pos):
         """Handle text drawing operations for a 3D render."""
+        GL.glColor3f(1, 1, 1)  # text in white
         GL.glDisable(GL.GL_LIGHTING)
         GL.glRasterPos3f(x_pos, y_pos, z_pos)
         font = GLUT.GLUT_BITMAP_HELVETICA_18
@@ -533,14 +525,21 @@ class Gui(wx.Frame):
 
 
 
-        # Configure the file menu
-
+        # Configure the menu bar
         fileMenu = wx.Menu()
+        helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, _("&EBNF"))
+
         fileMenu.SetTitle(_("File"))
+        fileMenu.Append(wx.ID_ABOUT, _("&About"))
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
+
+        helpMenu.SetTitle("Help")
+        helpMenu.Append(wx.ID_HELP, "&Help")
+        helpMenu.Append(wx.ID_HELP_CONTEXT, "&EBNF")
+
         menuBar.Append(fileMenu, _("&File"))
+        menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(menuBar)
 
         # set scrollable area for canvas
@@ -721,10 +720,17 @@ monitor = “monitor”, output, {output}, “;” ;"""
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
-        if Id == wx.ID_ABOUT:
+        if Id == wx.ID_HELP_CONTEXT:
             wx.MessageBox(self.EBNF_text,
                           _("Rules for the user definition file."),
                           wx.ICON_INFORMATION | wx.OK)
+        if Id == wx.ID_HELP:
+            text = _("Help button pressed.")
+            self.dialogue_box.write("{} \n \n".format(text))
+            self.dialogue_box.write("{} \n \n".format(self.help_text))
+        if Id == wx.ID_ABOUT:
+            wx.MessageBox("Logic Simulator\nCreated by James Thompson, Anna Mills and Neelay Sant\n2021",
+                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
@@ -933,6 +939,8 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.canvas.scene_rotate = np.identity(4, 'f')
         
         self.canvas.init = False
+        
+        # handle the change of view
 
         if self.canvas.choose_3D is False:
             self.canvas.choose_3D = True
