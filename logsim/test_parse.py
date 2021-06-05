@@ -21,7 +21,7 @@ def parser():
     cwd = os.getcwd()
 
     file_list = ["example1.txt", "example1_with_syntax_errors.txt",
-                 "error2.txt", "error1.txt"]
+                 "error2.txt", "error1.txt", "example_SIGGEN.txt", "error_SIGGEN.txt"]
     parser_list = []
     for item in file_list:
         if '/' in cwd:
@@ -47,6 +47,7 @@ def test_get_error_amount(parser):
     assert parser[0].scanner.error_count == 0
     assert parser[1].scanner.error_count == 2
     assert parser[2].scanner.error_count > 0
+    assert parser[4].scanner.error_count == 0
 
 
 def test_error_type(parser):
@@ -57,6 +58,7 @@ def test_error_type(parser):
     assert ("Expected 0 or 1 for switch state" and "Number of inputs must be integer in range(1, 17)" and
             "Unexpected dot. Can only specify port for DTYPE." in parser[3].scanner.error_message_list)
     assert 'Invalid name, may be keyword' in parser[3].scanner.error_message_list
+    assert "Expected 0 or 1 or keyword 'waveform'" in parser[5].scanner.error_message_list
 
 
 def test_devices(parser):
@@ -80,6 +82,15 @@ def test_devices(parser):
     for device_id in device_ids:
         dev.append(names.get_name_string(devices.get_device(device_id).device_kind))
     assert dev == expected_dev
+
+    names = parser[4].names
+    devices = parser[4].devices
+    device_ids = parser[4].devices.find_devices()
+
+    dev = []
+    for device_id in device_ids:
+        dev.append(names.get_name_string(devices.get_device(device_id).device_kind))
+    assert "SIGGEN" in dev
 
 
 def test_connections(parser):
