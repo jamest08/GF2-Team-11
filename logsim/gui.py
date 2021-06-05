@@ -498,8 +498,8 @@ class Gui(wx.Frame):
         self.spin_value = 0
         self.run_text = wx.StaticText(self, wx.ID_ANY, _('Run Simulation'))
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "0")
-        self.run_button = wx.Button(self, wx.ID_ANY, wx.GetTranslation("Run"))
-        self.continue_button = wx.Button(self, wx.ID_ANY, wx.GetTranslation("Continue"))
+        self.run_button = wx.Button(self, wx.ID_ANY,_("Run"))
+        self.continue_button = wx.Button(self, wx.ID_ANY, _("Continue"))
 
         # Declare "manage switches items"
 
