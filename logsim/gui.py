@@ -171,7 +171,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glEnable(GL.GL_NORMALIZE)
 
         # Viewing transformation - set the viewpoint back from the scene
-        GL.glTranslatef(0.0, 0.0, -self.depth_offset)
+        GL.glTranslatef(-350, 350, -self.depth_offset)
+
+        x = 40
+        y = 40
+        GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
 
         # Modelling transformation - pan, zoom and rotate
         GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
@@ -242,18 +246,30 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
-        # Draw a sample signal trace, make sure its centre of gravity
-        # is at the scene origin
-        GL.glColor3f(1.0, 0.7, 0.5)  # signal trace is beige
-        for i in range(-10, 10):
-            z = i * 20
-            if i % 2 == 0:
-                self.draw_cuboid(0, z, 5, 10, 1)
-            else:
-                self.draw_cuboid(0, z, 5, 10, 11)
+        device_number = 0
+        margin = self.monitors.get_margin()
 
-        GL.glColor3f(1.0, 1.0, 1.0)  # text is white
-        self.render_text_3D("D1.QBAR", 0, 0, 210)
+        for device_id, output_id in self.monitors.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+
+            x = device_number * 20
+
+            self.render_text_3D(monitor_name, x, 0, 0)
+
+            GL.glColor3f(0.7, 0.2, 1)  # signal trace is purple
+
+            # draw signal according to list of states
+
+            for i in range(len(signal_list)):
+                z = i * 20
+                if signal_list[i] == self.devices.LOW:
+                    self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 1)
+                elif signal_list[i] == self.devices.HIGH:
+                    self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 11)
+
+            device_number += 1
+
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -420,7 +436,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations for a 3D render."""
         GL.glDisable(GL.GL_LIGHTING)
         GL.glRasterPos3f(x_pos, y_pos, z_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_10
+        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
@@ -890,7 +906,6 @@ monitor = “monitor”, output, {output}, “;” ;"""
             self.canvas.choose_3D = False
             self.canvas.__init__(self.scrollable, wx.DefaultPosition,
                                  wx.Size(1000, 1000), self.devices, self.monitors)
-        
         self.canvas.render()
 
     def on_quit_button(self, event):
