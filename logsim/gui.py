@@ -679,7 +679,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
 
         """
         # if an unsupported language is requested default to English
-        if lang == "ja_JP.UTF-8":
+        if lang == "ja_JP.utf8":
             selLang = wx.LANGUAGE_JAPANESE
         else:
             selLang = wx.LANGUAGE_ENGLISH

@@ -73,6 +73,7 @@ def main(arg_list):
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
+            print(arg_list)
             gui = Gui("Logic Simulator", path, names, devices, network,
                       monitors)
             gui.Show(True)
@@ -81,3 +82,6 @@ def main(arg_list):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+    print(sys.argv[0])
+    print(sys.argv[1])
+    print(sys.argv[2])
