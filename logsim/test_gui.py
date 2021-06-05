@@ -23,7 +23,11 @@ from gui import MyGLCanvas
 def gui():
 
     cwd = os.getcwd()
-    path = cwd + '\\' + 'example1.txt'
+
+    if '/' in cwd:
+        path = cwd + '/' + 'example1.txt'
+    else:
+        path = cwd + '\\' + 'example1.txt'
 
     names = Names()
     devices = Devices(names)
