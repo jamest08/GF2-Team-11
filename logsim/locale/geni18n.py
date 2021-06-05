@@ -18,13 +18,7 @@ catalog.
 
 """
 
-#import app_const as appC
 
-# we remove English as source code strings are in English
-"""supportedLang = []
-for l in appC.supLang:
-    if l != u"en":
-        supportedLang.append(l)"""
 
 import os
 import sys
@@ -56,10 +50,10 @@ print ("cmd: %s" % tCmd)
 rCode = subprocess.call(tCmd)
 print ("return code: %s\n\n" % rCode)
 
-"""
+
 tLang = wx.LANGUAGE_JAPANESE
 # build command for msgfmt
-langDir = os.path.join(appFolder, ('locale\%s\LC_MESSAGES' % tLang))
+langDir = os.path.join(appFolder, ('locale'))
 poFile = os.path.join(langDir, "jap" + '.po')
 tCmd = pyExe + ' ' + pyMsgfmt + ' ' + poFile
     
@@ -67,4 +61,3 @@ print ("Generating the .mo file")
 print ("cmd: %s" % tCmd)
 rCode = subprocess.call(tCmd)
 print ("return code: %s\n\n" % rCode)
-"""

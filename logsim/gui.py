@@ -9,13 +9,15 @@ MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
 import wx
+import gettext
 
 import wx.glcanvas as wxcanvas
 import numpy as np
 import math
+import os
 
 from OpenGL import GL, GLU, GLUT
-from wx.core import BoxSizer, LANGUAGE_JAPANESE, LANGUAGE_JAVANESE
+from wx.core import BoxSizer, LANGUAGE_JAPANESE
 
 
 import sys
@@ -457,18 +459,30 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(600, 530))
 
-        self.mylocale = wx.Locale()
+        self.mylocale = wx.Locale(wx.LANGUAGE_JAPANESE)
         self.mylocale.AddCatalogLookupPathPrefix('.')
         self.mylocale.AddCatalog('jap')
 
-        builtins.__dict__['_'] = wx.GetTranslation
         self.updateLanguage("ja_JP.utf8")
+        os.environ['LANG'] = "ja_JP.utf8"
+        #print(self.mylocale.GetLocale())
+
+        #builtins.__dict__['_'] = wx.GetTranslation
+        _ = gettext.gettext
+        
+        ja = gettext.translation('jap', localedir='locale', languages=['ja:en'])
+        ja.install()
+
+        _ = ja.gettext
+
+
+
         # Configure the file menu
 
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, _(u"&EBNF"))
-        fileMenu.SetTitle(_(u"File"))
+        fileMenu.Append(wx.ID_ABOUT, _("&EBNF"))
+        fileMenu.SetTitle(_("File"))
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
         menuBar.Append(fileMenu, _("&File"))
         self.SetMenuBar(menuBar)
@@ -482,14 +496,14 @@ class Gui(wx.Frame):
         # Declare "run simulation items"
 
         self.spin_value = 0
-        self.run_text = wx.StaticText(self, wx.ID_ANY, _(u'Run Simulation'))
+        self.run_text = wx.StaticText(self, wx.ID_ANY, _('Run Simulation'))
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "0")
-        self.run_button = wx.Button(self, wx.ID_ANY, _(u"Run"))
-        self.continue_button = wx.Button(self, wx.ID_ANY, _(u"Continue"))
+        self.run_button = wx.Button(self, wx.ID_ANY, wx.GetTranslation("Run"))
+        self.continue_button = wx.Button(self, wx.ID_ANY, wx.GetTranslation("Continue"))
 
         # Declare "manage switches items"
 
-        self.switches_text = wx.StaticText(self, wx.ID_ANY, _(u"Manage Switches"))
+        self.switches_text = wx.StaticText(self, wx.ID_ANY, _("Manage Switches"))
 
         self.switches_id_list = devices.find_devices(devices.SWITCH)
         self.switches_list = []
@@ -499,11 +513,11 @@ class Gui(wx.Frame):
 
         self.switches = wx.Choice(self, wx.ID_ANY, choices=self.switches_list)
         self.switch_setting = wx.Choice(self, wx.ID_ANY, choices=["0", "1"])
-        self.switch_button = wx.Button(self, wx.ID_ANY, _(u"Switch"))
+        self.switch_button = wx.Button(self, wx.ID_ANY, _("Switch"))
 
         # Declare "manage monitors items"
 
-        self.monitors_text = wx.StaticText(self, wx.ID_ANY, _(u"Manage Monitors"))
+        self.monitors_text = wx.StaticText(self, wx.ID_ANY, _("Manage Monitors"))
 
         self.monitored_list = monitors.get_signal_names()[0]
         self.unmonitored_list = monitors.get_signal_names()[1]
@@ -511,15 +525,15 @@ class Gui(wx.Frame):
         self.monitored = wx.Choice(self, wx.ID_ANY, choices=self.monitored_list)
         self.not_monitored = wx.Choice(self, wx.ID_ANY, choices=self.unmonitored_list)
 
-        self.add_monitor_button = wx.Button(self, wx.ID_ANY, _(u"Add"))
-        self.zap_monitor_button = wx.Button(self, wx.ID_ANY, _(u"Zap"))
+        self.add_monitor_button = wx.Button(self, wx.ID_ANY, _("Add"))
+        self.zap_monitor_button = wx.Button(self, wx.ID_ANY, _("Zap"))
         
         # declare bottom items
 
-        self.toggle_view_button = wx.Button(self, wx.ID_ANY, "Toggle 2D/3D")
+        self.toggle_view_button = wx.Button(self, wx.ID_ANY, _("Toggle 2D/3D"))
 
-        self.quit_button = wx.Button(self, wx.ID_ANY, _(u"Quit"))
-        self.help_button = wx.Button(self, wx.ID_ANY, _(u"Help"))
+        self.quit_button = wx.Button(self, wx.ID_ANY, _("Quit"))
+        self.help_button = wx.Button(self, wx.ID_ANY, _("Help"))
 
         self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                         style=wx.TE_MULTILINE | wx.TE_READONLY)
@@ -643,6 +657,8 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.monitors = monitors
         self.network = network
 
+        
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         print("menu button pressed")
@@ -651,7 +667,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
             self.Close(True)
         if Id == wx.ID_ABOUT:
             wx.MessageBox(self.EBNF_text,
-                          _(u"Rules for the user definition file."),
+                          _("Rules for the user definition file."),
                           wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
@@ -688,7 +704,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         cycles = self.spin_value
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
-                text = _(u"Error! Nothing to continue. Run first.")
+                text = _("Error! Nothing to continue. Run first.")
                 print(text)
             elif self.run_network(cycles):
                 self.cycles_completed += cycles
@@ -712,10 +728,10 @@ monitor = “monitor”, output, {output}, “;” ;"""
             switch_state = choice
             if switch_state is not None:
                 if self.devices.set_switch(switch_id, switch_state):
-                    text = _(u"Successfully set switch.")
+                    text = _("Successfully set switch.")
                     print(text)
                 else:
-                    text = _(u"Error! Invalid switch.")
+                    text = _("Error! Invalid switch.")
                     print(text)
 
         self.dialogue_box.write("{} \n".format(text))
@@ -728,7 +744,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         try:
             monitor_name = self.monitored.GetString(self.monitored.GetSelection())
         except Exception:
-            text = _(u"Error! Could not zap monitor.")
+            text = _("Error! Could not zap monitor.")
             print(text)
             self.dialogue_box.write("{} \n".format(text))
             return False
@@ -762,10 +778,10 @@ monitor = “monitor”, output, {output}, “;” ;"""
         if monitor is not None:
             [device, port] = monitor
             if self.monitors.remove_monitor(device, port):
-                text = _(u"Successfully zapped monitor")
+                text = _("Successfully zapped monitor")
                 print(text)
             else:
-                text = _(u"Error! Could not zap monitor.")
+                text = _("Error! Could not zap monitor.")
                 print(text)
 
         self.canvas.render()
@@ -789,7 +805,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         try:
             monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
         except Exception:
-            text = _(u"Error! Could not make monitor.")
+            text = _("Error! Could not make monitor.")
             print(text)
             self.dialogue_box.write("{} \n".format(text))
             return False
@@ -824,10 +840,10 @@ monitor = “monitor”, output, {output}, “;” ;"""
             [device, port] = monitor
             monitor_error = self.monitors.make_monitor(device, port, self.cycles_completed)
             if monitor_error == self.monitors.NO_ERROR:
-                text = _(u"Successfully made monitor.")
+                text = _("Successfully made monitor.")
                 print(text)
             else:
-                text = _(u"Error! Could not make monitor.")
+                text = _("Error! Could not make monitor.")
                 print(text)
 
         self.canvas.render()

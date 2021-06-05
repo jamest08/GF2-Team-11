@@ -4,77 +4,81 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Logsim\n"
-"POT-Creation-Date: 2021-06-04 18:20+0100\n"
-"PO-Revision-Date: 2021-06-05 14:46+0100\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-06-05 16:15+0100\n"
+"PO-Revision-Date: 2021-06-05 16:38+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Last-Translator: \n"
-"Language-Team: Team 11\n"
+"Language-Team: \n"
 "Language: ja_JP\n"
 "X-Generator: Poedit 3.0\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: gui.py:261
+#: gui.py:477
 msgid "&EBNF"
 msgstr "&EBNF"
 
-#: gui.py:262
+#: gui.py:478
 msgid "File"
 msgstr "ファイル"
 
-#: gui.py:263
+#: gui.py:479
 msgid "&Exit"
 msgstr "&出口"
 
-#: gui.py:264
+#: gui.py:480
 msgid "&File"
-msgstr "＆ファイル"
+msgstr "ファイル"
 
-#: gui.py:276
+#: gui.py:492
 msgid "Run Simulation"
-msgstr "シミュレーションを実行"
+msgstr "シミュレーションを開始"
 
-#: gui.py:278
+#: gui.py:494
 msgid "Run"
-msgstr "走る"
+msgstr "赴く"
 
-#: gui.py:279
+#: gui.py:495
 msgid "Continue"
-msgstr "続ける"
+msgstr "継続する"
 
-#: gui.py:283
+#: gui.py:499
 msgid "Manage Switches"
-msgstr "スイッチの管理"
+msgstr "スイッチを管理する"
 
-#: gui.py:293
+#: gui.py:509
 msgid "Switch"
 msgstr "スイッチ"
 
-#: gui.py:297
+#: gui.py:513
 msgid "Manage Monitors"
-msgstr "モニタの管理"
+msgstr "モニターを管理する"
 
-#: gui.py:305
-msgid "Zap"
-msgstr "追加"
-
-#: gui.py:306
+#: gui.py:521
 msgid "Add"
 msgstr "追加"
 
-#: gui.py:310
+#: gui.py:522
+msgid "Zap"
+msgstr "削除する"
+
+#: gui.py:526
+msgid "Toggle 2D/3D"
+msgstr ""
+
+#: gui.py:528
 msgid "Quit"
 msgstr "見切り"
 
-#: gui.py:311
+#: gui.py:529
 msgid "Help"
 msgstr "助けて"
 
-#: gui.py:316
+#: gui.py:534
 msgid ""
 "HELP MENU: \n"
 "\n"
@@ -114,46 +118,46 @@ msgstr ""
 "\n"
 "プログラムを終了するには、[終了] をクリックします "
 
-#: gui.py:443
+#: gui.py:663
 msgid "Rules for the user definition file."
 msgstr "ユーザー定義ファイルのルール."
 
-#: gui.py:480
+#: gui.py:700
 msgid "Error! Nothing to continue. Run first."
 msgstr "エラー！最初に実行します。"
 
-#: gui.py:504
+#: gui.py:724
 msgid "Successfully set switch."
 msgstr "見事にスイッチ交換。"
 
-#: gui.py:507
+#: gui.py:727
 msgid "Error! Invalid switch."
 msgstr "エラー！無効なスイッチです。"
 
-#: gui.py:520 gui.py:557
+#: gui.py:740 gui.py:777
 msgid "Error! Could not zap monitor."
 msgstr "エラー！このモニターを削除できませんでした。"
 
-#: gui.py:554
+#: gui.py:774
 msgid "Successfully zapped monitor"
 msgstr "モニターが正常に削除されました"
 
-#: gui.py:581 gui.py:620
+#: gui.py:801 gui.py:839
 msgid "Error! Could not make monitor."
 msgstr "エラー！モニターできませんでした."
 
-#: gui.py:617
+#: gui.py:836
 msgid "Successfully made monitor."
 msgstr "モニターの作成に成功しました。"
 
-#: gui.py:638
+#: gui.py:885
 msgid "Quitting program."
 msgstr "プログラムを終了する."
 
-#: gui.py:643
+#: gui.py:890
 msgid "Help button pressed."
 msgstr "ヘルプボタンが押されました."
 
-#: gui.py:657
+#: gui.py:904
 msgid "Error! Network oscillating."
 msgstr "エラー！ネットワーク振動。"
