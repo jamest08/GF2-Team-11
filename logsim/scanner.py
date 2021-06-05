@@ -98,8 +98,13 @@ class Scanner:
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
-        if self.current_character == "#":  # comments skipped
+        if self.current_character == "#":  # paragraph comments skipped
             self.skip_comment()
+            return self.get_symbol()
+
+        if self.current_character == "%":  # line comment skipped
+            self.file.readline()
+            self.last_comment_pos = self.file.tell()
             return self.get_symbol()
 
         if self.current_character.isalpha():  # name
@@ -223,19 +228,19 @@ class Scanner:
         self.last_comment_pos = self.file.tell()
         self.current_character = z
 
-    def display_error(self, error_message, caret=True):
+    def display_error(self, error_message, caret=True, semicolon_error=False):
         """Display line of error and the error_message."""
         self.error_count += 1
         error_position = self.file.tell()
 
         self.error_message_list.append(error_message)
-        if self.last_semicolon_pos > self.last_comment_pos:
+        if self.last_semicolon_pos > self.last_comment_pos or semicolon_error:
             if self.current_character == ';':
                 pos = self.last_last_semicolon_pos
                 difference = error_position - self.last_last_semicolon_pos
             else:
                 pos = self.last_semicolon_pos
-                difference = error_position-self.last_semicolon_pos
+                difference = error_position - self.last_semicolon_pos
         else:
             pos = self.last_comment_pos
             difference = error_position - self.last_comment_pos
