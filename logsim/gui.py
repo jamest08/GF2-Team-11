@@ -171,9 +171,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glEnable(GL.GL_NORMALIZE)
 
         # Viewing transformation - set the viewpoint back from the scene
-        GL.glTranslatef(0.0, 0.0, -self.depth_offset)
+        # Translate the waveforms to start in the top left hand corner
+
+        GL.glTranslatef(-350, 350, -self.depth_offset)
+
+        # rotate the waveforms to start a viewable angle
+
+        x = 40
+        y = 40
+        GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
 
         # Modelling transformation - pan, zoom and rotate
+
         GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
         GL.glMultMatrixf(self.scene_rotate)
         GL.glScalef(self.zoom, self.zoom, self.zoom)
@@ -199,6 +208,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # get list of signals for a single monitor
 
         device_number = 0
+        signal_list_length = 0
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
@@ -215,7 +225,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             # draw signal according to list of states
 
-            for i in range(len(signal_list)):
+            signal_list_length = len(signal_list)
+
+            for i in range(signal_list_length):
                 x = (i * 20) + 40 + margin*10
                 x_next = (i * 20) + 60 + margin*10
                 if signal_list[i] == self.devices.LOW:
@@ -225,12 +237,24 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 elif signal_list[i] == self.devices.BLANK:
                     y = 0
 
+                # keep waveforms for monitor points added after
+                # first cycles blank until point of addition
+
                 if y != 0:
                     GL.glVertex2f(x, y)
                     GL.glVertex2f(x_next, y)
             GL.glEnd()
 
             device_number += 1
+        
+        # draw x axis
+
+        x = 10
+        y = 85 + (device_number)*50
+        for i in range(signal_list_length):
+            x = (i * 20) + 40 + margin*10
+            x_next = (i * 20) + 60 + margin*10
+            self.render_text_2D(str(i), x, y)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -242,18 +266,35 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
-        # Draw a sample signal trace, make sure its centre of gravity
-        # is at the scene origin
-        GL.glColor3f(1.0, 0.7, 0.5)  # signal trace is beige
-        for i in range(-10, 10):
-            z = i * 20
-            if i % 2 == 0:
-                self.draw_cuboid(0, z, 5, 10, 1)
-            else:
-                self.draw_cuboid(0, z, 5, 10, 11)
+        device_number = 0
+        margin = self.monitors.get_margin()
 
-        GL.glColor3f(1.0, 1.0, 1.0)  # text is white
-        self.render_text_3D("D1.QBAR", 0, 0, 210)
+        for device_id, output_id in self.monitors.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+
+            x = device_number * 20
+            self.render_text_3D(monitor_name, x, 0, 0)
+            GL.glColor3f(0.7, 0.2, 1)  # signal trace is purple
+
+            # draw signal according to list of states
+
+            signal_list_length = len(signal_list)
+
+            for i in range(signal_list_length):
+                z = i * 20
+                if signal_list[i] == self.devices.LOW:
+                    self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 1)
+                elif signal_list[i] == self.devices.HIGH:
+                    self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 11)
+
+            device_number += 1
+        
+        # draw axis for number of cycles.
+
+        for i in range(signal_list_length):
+            z = i * 20
+            self.render_text_3D(str(i), -20, 0, z + 10 + margin*10)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -418,9 +459,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_text_3D(self, text, x_pos, y_pos, z_pos):
         """Handle text drawing operations for a 3D render."""
+        GL.glColor3f(1, 1, 1)  # text in white
         GL.glDisable(GL.GL_LIGHTING)
         GL.glRasterPos3f(x_pos, y_pos, z_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_10
+        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
@@ -483,14 +525,21 @@ class Gui(wx.Frame):
 
 
 
-        # Configure the file menu
-
+        # Configure the menu bar
         fileMenu = wx.Menu()
+        helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, _("&EBNF"))
+
         fileMenu.SetTitle(_("File"))
+        fileMenu.Append(wx.ID_ABOUT, _("&About"))
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
+
+        helpMenu.SetTitle("Help")
+        helpMenu.Append(wx.ID_HELP, "&Help")
+        helpMenu.Append(wx.ID_HELP_CONTEXT, "&EBNF")
+
         menuBar.Append(fileMenu, _("&File"))
+        menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(menuBar)
 
         # set scrollable area for canvas
@@ -671,10 +720,17 @@ monitor = “monitor”, output, {output}, “;” ;"""
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
-        if Id == wx.ID_ABOUT:
+        if Id == wx.ID_HELP_CONTEXT:
             wx.MessageBox(self.EBNF_text,
                           _("Rules for the user definition file."),
                           wx.ICON_INFORMATION | wx.OK)
+        if Id == wx.ID_HELP:
+            text = _("Help button pressed.")
+            self.dialogue_box.write("{} \n \n".format(text))
+            self.dialogue_box.write("{} \n \n".format(self.help_text))
+        if Id == wx.ID_ABOUT:
+            wx.MessageBox("Logic Simulator\nCreated by James Thompson, Anna Mills and Neelay Sant\n2021",
+                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
@@ -883,6 +939,8 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.canvas.scene_rotate = np.identity(4, 'f')
         
         self.canvas.init = False
+        
+        # handle the change of view
 
         if self.canvas.choose_3D is False:
             self.canvas.choose_3D = True
@@ -890,7 +948,6 @@ monitor = “monitor”, output, {output}, “;” ;"""
             self.canvas.choose_3D = False
             self.canvas.__init__(self.scrollable, wx.DefaultPosition,
                                  wx.Size(1000, 1000), self.devices, self.monitors)
-        
         self.canvas.render()
 
     def on_quit_button(self, event):
