@@ -463,7 +463,7 @@ class Gui(wx.Frame):
         #self.mylocale.AddCatalogLookupPathPrefix('.')
         #self.mylocale.AddCatalog('jap')
 
-        #self.updateLanguage("ja_JP.utf8")
+        #self.updateLanguage("ja_JP.utf8") 
         #os.environ['LANG'] = "ja_JP.utf8"
         #print(self.mylocale.GetLocale())
 
