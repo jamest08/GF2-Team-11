@@ -1,0 +1,161 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-06-05 16:15+0100\n"
+"PO-Revision-Date: 2021-06-05 18:47+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en_GB\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: gui.py:477
+msgid "&EBNF"
+msgstr "&EBNF"
+
+#: gui.py:478
+msgid "File"
+msgstr "File"
+
+#: gui.py:479
+msgid "&Exit"
+msgstr "&Exit"
+
+#: gui.py:480
+msgid "&File"
+msgstr "&File"
+
+#: gui.py:492
+msgid "Run Simulation"
+msgstr "Run Simulation"
+
+#: gui.py:494
+msgid "Run"
+msgstr "Run"
+
+#: gui.py:495
+msgid "Continue"
+msgstr "Continue"
+
+#: gui.py:499
+msgid "Manage Switches"
+msgstr "Manage Switches"
+
+#: gui.py:509
+msgid "Switch"
+msgstr "Switch"
+
+#: gui.py:513
+msgid "Manage Monitors"
+msgstr "Manage Monitors"
+
+#: gui.py:521
+msgid "Add"
+msgstr "Add"
+
+#: gui.py:522
+msgid "Zap"
+msgstr "Zap"
+
+#: gui.py:526
+msgid "Toggle 2D/3D"
+msgstr "Toggle 2D/3D"
+
+#: gui.py:528
+msgid "Quit"
+msgstr "Quit"
+
+#: gui.py:529
+msgid "Help"
+msgstr "Help"
+
+#: gui.py:534
+msgid ""
+"HELP MENU: \n"
+"\n"
+"        To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n"
+"\n"
+"        To continue the simulation for N cycles, select N with the scroll menu.\n"
+"        Then click 'Continue'. \n"
+"\n"
+"        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.\n"
+"        Then select a state for the switch to be in. Then click 'Switch'. \n"
+"\n"
+"        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.\n"
+"        Then click 'Zap'. \n"
+"\n"
+"        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.\n"
+"        Then click 'Add'. \n"
+"\n"
+"        To quit the program, click quit. "
+msgstr ""
+"HELP MENU: \n"
+"\n"
+"        To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n"
+"\n"
+"        To continue the simulation for N cycles, select N with the scroll menu.\n"
+"        Then click 'Continue'. \n"
+"\n"
+"        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.\n"
+"        Then select a state for the switch to be in. Then click 'Switch'. \n"
+"\n"
+"        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.\n"
+"        Then click 'Zap'. \n"
+"\n"
+"        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.\n"
+"        Then click 'Add'. \n"
+"\n"
+"        To quit the program, click quit. "
+
+#: gui.py:663
+msgid "Rules for the user definition file."
+msgstr "Rules for the user definition file."
+
+#: gui.py:700
+msgid "Error! Nothing to continue. Run first."
+msgstr "Error! Nothing to continue. Run first."
+
+#: gui.py:724
+msgid "Successfully set switch."
+msgstr "Successfully set switch."
+
+#: gui.py:727
+msgid "Error! Invalid switch."
+msgstr "Error! Invalid switch."
+
+#: gui.py:740 gui.py:777
+msgid "Error! Could not zap monitor."
+msgstr "Error! Could not zap monitor."
+
+#: gui.py:774
+msgid "Successfully zapped monitor"
+msgstr "Successfully zapped monitor"
+
+#: gui.py:801 gui.py:839
+msgid "Error! Could not make monitor."
+msgstr "Error! Could not make monitor."
+
+#: gui.py:836
+msgid "Successfully made monitor."
+msgstr "Successfully made monitor."
+
+#: gui.py:885
+msgid "Quitting program."
+msgstr "Quitting program."
+
+#: gui.py:890
+msgid "Help button pressed."
+msgstr "Help button pressed."
+
+#: gui.py:904
+msgid "Error! Network oscillating."
+msgstr "Error! Network oscillating."

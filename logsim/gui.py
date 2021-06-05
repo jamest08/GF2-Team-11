@@ -459,21 +459,27 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(600, 530))
 
-        self.mylocale = wx.Locale(wx.LANGUAGE_JAPANESE)
-        self.mylocale.AddCatalogLookupPathPrefix('.')
-        self.mylocale.AddCatalog('jap')
+        self.mylocale = wx.Locale()
+        #self.mylocale.AddCatalogLookupPathPrefix('.')
+        #self.mylocale.AddCatalog('jap')
 
-        self.updateLanguage("ja_JP.utf8")
-        os.environ['LANG'] = "ja_JP.utf8"
+        #self.updateLanguage("ja_JP.utf8")
+        #os.environ['LANG'] = "ja_JP.utf8"
         #print(self.mylocale.GetLocale())
 
         #builtins.__dict__['_'] = wx.GetTranslation
-        _ = gettext.gettext
+        #_ = gettext.gettext
         
-        ja = gettext.translation('jap', localedir='locale', languages=['ja:en'])
-        ja.install()
+        if self.mylocale.GetLanguageCanonicalName(self.mylocale.GetSystemLanguage()) == "ja_JP":
+            ja = gettext.translation('jap', localedir='locale', languages=['ja:en'])
+            ja.install()
 
-        _ = ja.gettext
+            _ = ja.gettext
+        else:
+            en = gettext.translation('jap', localedir='locale', languages=['en'] )
+            en.install()
+
+            _ = en.gettext
 
 
 
