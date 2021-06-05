@@ -130,7 +130,7 @@ class Parser:
 
             # check for semicolon at end of all lines
             if self.current_symbol.id != self.names.query(';'):
-                self.scanner.display_error('Expected semicolon')
+                self.scanner.display_error('Expected semicolon', semicolon_error=True)
 
         # check all inputs connected
         floating_inputs = self.network.check_network()

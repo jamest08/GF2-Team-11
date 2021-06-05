@@ -9,10 +9,13 @@ MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
 import wx
-from wx.core import BoxSizer, LANGUAGE_JAPANESE
+
 import wx.glcanvas as wxcanvas
+import numpy as np
+import math
 import builtins
-from OpenGL import GL, GLUT
+from OpenGL import GL, GLU, GLUT
+from wx.core import BoxSizer, LANGUAGE_JAPANESE
 
 
 import sys
@@ -41,7 +44,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     --------------
     init_gl(self): Configures the OpenGL context.
 
-    render(self, text): Handles all drawing operations.
+    render(self): Handles all drawing operations.
 
     on_paint(self, event): Handles the paint event.
 
@@ -63,14 +66,35 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.init = False
         self.context = wxcanvas.GLContext(self)
 
+        # Constants for OpenGL materials and lights
+        self.mat_diffuse = [0.0, 0.0, 0.0, 1.0]
+        self.mat_no_specular = [0.0, 0.0, 0.0, 0.0]
+        self.mat_no_shininess = [0.0]
+        self.mat_specular = [0.5, 0.5, 0.5, 1.0]
+        self.mat_shininess = [50.0]
+        self.top_right = [1.0, 1.0, 1.0, 0.0]
+        self.straight_on = [0.0, 0.0, 1.0, 0.0]
+        self.no_ambient = [0.0, 0.0, 0.0, 1.0]
+        self.dim_diffuse = [0.5, 0.5, 0.5, 1.0]
+        self.bright_diffuse = [1.0, 1.0, 1.0, 1.0]
+        self.med_diffuse = [0.75, 0.75, 0.75, 1.0]
+        self.full_specular = [0.5, 0.5, 0.5, 1.0]
+        self.no_specular = [0.0, 0.0, 0.0, 1.0]
+
         # Initialise variables for panning
         self.pan_x = 0
         self.pan_y = 0
         self.last_mouse_x = 0  # previous mouse x position
         self.last_mouse_y = 0  # previous mouse y position
 
+        # Initialise the scene rotation matrix
+        self.scene_rotate = np.identity(4, 'f')
+
         # Initialise variables for zooming
         self.zoom = 1
+
+        # Offset between viewpoint and origin of the scene
+        self.depth_offset = 1000
 
         # Bind events to the canvas
         self.Bind(wx.EVT_PAINT, self.on_paint)
@@ -80,34 +104,94 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.devices = devices
         self.monitors = monitors
 
+        self.choose_3D = False
+
     def init_gl(self):
-        """Configure and initialise the OpenGL context."""
+        """Handle directing initialise command to the 2D or 3D handler."""
+        if self.choose_3D is False:
+            self.init_2D()
+        else:
+            self.init_3D()
+
+    def init_2D(self):
+        """Configure and initialise the OpenGL context for a 2D render."""
         size = self.GetClientSize()
         self.SetCurrent(self.context)
-        GL.glDrawBuffer(GL.GL_BACK)
         GL.glClearColor(1.0, 1.0, 1.0, 0.0)
+        GL.glDrawBuffer(GL.GL_BACK)
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GL.glOrtho(0, size.width, size.height, 0, -1, 1)
-        GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
+    
+    def init_3D(self):
+        """Configure and initialise the OpenGL context for a 3D render."""
+        size = self.GetClientSize()
+        self.SetCurrent(self.context)
 
-    def render(self, text):
-        """Handle all drawing operations."""
+        GL.glViewport(0, 0, size.width, size.height)
+
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+        GLU.gluPerspective(45, size.width / size.height, 10, 10000)
+
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glLoadIdentity()  # lights positioned relative to the viewer
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, self.no_ambient)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, self.med_diffuse)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, self.no_specular)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, self.top_right)
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, self.no_ambient)
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, self.dim_diffuse)
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, self.no_specular)
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, self.straight_on)
+
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, self.mat_specular)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, self.mat_shininess)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE,
+                        self.mat_diffuse)
+        GL.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE)
+
+        GL.glClearColor(0.0, 0.0, 0.0, 0.0)
+        GL.glDepthFunc(GL.GL_LEQUAL)
+        GL.glShadeModel(GL.GL_SMOOTH)
+        GL.glDrawBuffer(GL.GL_BACK)
+        GL.glCullFace(GL.GL_BACK)
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glEnable(GL.GL_CULL_FACE)
+        GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
+        GL.glEnable(GL.GL_LIGHT1)
+        GL.glEnable(GL.GL_NORMALIZE)
+
+        # Viewing transformation - set the viewpoint back from the scene
+        GL.glTranslatef(0.0, 0.0, -self.depth_offset)
+
+        # Modelling transformation - pan, zoom and rotate
+        GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
+        GL.glMultMatrixf(self.scene_rotate)
+        GL.glScalef(self.zoom, self.zoom, self.zoom)
+
+    def render(self):
+        """Handle directing render command to the 2D or 3D handler."""
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the viewport, modelview and projection matrices
             self.init_gl()
             self.init = True
 
-        # Clear everything
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        if self.choose_3D is False:
+            self.render_2D()
+        else:
+            self.render_3D()
 
-        # Draw specified text at position (10, 10)
-        self.render_text(text, 10, 50)
+    def render_2D(self):
+        """Handle all drawing operations for a 2D render."""
+        # clear everything
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
         # get list of signals for a single monitor
 
@@ -120,7 +204,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x = 10
             y = 85 + device_number*50
 
-            self.render_text(monitor_name, x, y)
+            self.render_text_2D(monitor_name, x, y)
             margin = self.monitors.get_margin()
 
             GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
@@ -150,6 +234,68 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glFlush()
         self.SwapBuffers()
 
+    def render_3D(self):
+        """Handle all drawing operations for a 3D render."""
+        # Clear everything
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+
+        # Draw a sample signal trace, make sure its centre of gravity
+        # is at the scene origin
+        GL.glColor3f(1.0, 0.7, 0.5)  # signal trace is beige
+        for i in range(-10, 10):
+            z = i * 20
+            if i % 2 == 0:
+                self.draw_cuboid(0, z, 5, 10, 1)
+            else:
+                self.draw_cuboid(0, z, 5, 10, 11)
+
+        GL.glColor3f(1.0, 1.0, 1.0)  # text is white
+        self.render_text_3D("D1.QBAR", 0, 0, 210)
+
+        # We have been drawing to the back buffer, flush the graphics pipeline
+        # and swap the back buffer to the front
+        GL.glFlush()
+        self.SwapBuffers()
+
+    def draw_cuboid(self, x_pos, z_pos, half_width, half_depth, height):
+        """Draw a cuboid.
+
+        Draw a cuboid at the specified position, with the specified
+        dimensions.
+        """
+        GL.glBegin(GL.GL_QUADS)
+        GL.glNormal3f(0, -1, 0)
+        GL.glVertex3f(x_pos - half_width, -6, z_pos - half_depth)
+        GL.glVertex3f(x_pos + half_width, -6, z_pos - half_depth)
+        GL.glVertex3f(x_pos + half_width, -6, z_pos + half_depth)
+        GL.glVertex3f(x_pos - half_width, -6, z_pos + half_depth)
+        GL.glNormal3f(0, 1, 0)
+        GL.glVertex3f(x_pos + half_width, -6 + height, z_pos - half_depth)
+        GL.glVertex3f(x_pos - half_width, -6 + height, z_pos - half_depth)
+        GL.glVertex3f(x_pos - half_width, -6 + height, z_pos + half_depth)
+        GL.glVertex3f(x_pos + half_width, -6 + height, z_pos + half_depth)
+        GL.glNormal3f(-1, 0, 0)
+        GL.glVertex3f(x_pos - half_width, -6 + height, z_pos - half_depth)
+        GL.glVertex3f(x_pos - half_width, -6, z_pos - half_depth)
+        GL.glVertex3f(x_pos - half_width, -6, z_pos + half_depth)
+        GL.glVertex3f(x_pos - half_width, -6 + height, z_pos + half_depth)
+        GL.glNormal3f(1, 0, 0)
+        GL.glVertex3f(x_pos + half_width, -6, z_pos - half_depth)
+        GL.glVertex3f(x_pos + half_width, -6 + height, z_pos - half_depth)
+        GL.glVertex3f(x_pos + half_width, -6 + height, z_pos + half_depth)
+        GL.glVertex3f(x_pos + half_width, -6, z_pos + half_depth)
+        GL.glNormal3f(0, 0, -1)
+        GL.glVertex3f(x_pos - half_width, -6, z_pos - half_depth)
+        GL.glVertex3f(x_pos - half_width, -6 + height, z_pos - half_depth)
+        GL.glVertex3f(x_pos + half_width, -6 + height, z_pos - half_depth)
+        GL.glVertex3f(x_pos + half_width, -6, z_pos - half_depth)
+        GL.glNormal3f(0, 0, 1)
+        GL.glVertex3f(x_pos - half_width, -6 + height, z_pos + half_depth)
+        GL.glVertex3f(x_pos - half_width, -6, z_pos + half_depth)
+        GL.glVertex3f(x_pos + half_width, -6, z_pos + half_depth)
+        GL.glVertex3f(x_pos + half_width, -6 + height, z_pos + half_depth)
+        GL.glEnd()
+
     def on_paint(self, event):
         """Handle the paint event."""
         self.SetCurrent(self.context)
@@ -161,7 +307,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         size = self.GetClientSize()
         text = "".join(["Canvas redrawn on paint event, size is ",
                         str(size.width), ", ", str(size.height)])
-        self.render(text)
+        self.render()
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -170,13 +316,19 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.init = False
 
     def on_mouse(self, event):
-        """Handle mouse events."""
+        """Handle directing mouse events to the 2D or 3D handler."""
+        if self.choose_3D is False:
+            self.on_mouse_2D(event)
+        else:
+            self.on_mouse_3D(event)
+    
+    def on_mouse_2D(self, event):
+        """Handle mouse events for a 2D render."""
         text = ""
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = -event.GetY()
-            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
+
         if event.ButtonUp():
             text = "".join(["Mouse button released at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
@@ -207,12 +359,49 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
         if text:
-            self.render(text)
+            self.render()
         else:
             self.Refresh()  # triggers the paint event
 
-    def render_text(self, text, x_pos, y_pos):
-        """Handle text drawing operations."""
+    def on_mouse_3D(self, event):
+        """Handle mouse events for a 3D render."""
+        if event.ButtonDown():
+            self.last_mouse_x = event.GetX()
+            self.last_mouse_y = event.GetY()
+
+        if event.Dragging():
+            GL.glMatrixMode(GL.GL_MODELVIEW)
+            GL.glLoadIdentity()
+            x = event.GetX() - self.last_mouse_x
+            y = event.GetY() - self.last_mouse_y
+            if event.LeftIsDown():
+                GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
+            if event.MiddleIsDown():
+                GL.glRotatef((x + y), 0, 0, 1)
+            if event.RightIsDown():
+                self.pan_x += x
+                self.pan_y -= y
+            GL.glMultMatrixf(self.scene_rotate)
+            GL.glGetFloatv(GL.GL_MODELVIEW_MATRIX, self.scene_rotate)
+            self.last_mouse_x = event.GetX()
+            self.last_mouse_y = event.GetY()
+            self.init = False
+
+        if event.GetWheelRotation() < 0:
+            self.zoom *= (1.0 + (
+                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            self.init = False
+
+        if event.GetWheelRotation() > 0:
+            self.zoom /= (1.0 - (
+                event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            self.init = False
+
+        self.Refresh()  # triggers the paint event
+        
+
+    def render_text_2D(self, text, x_pos, y_pos):
+        """Handle text drawing operations for a 2D render."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
         font = GLUT.GLUT_BITMAP_HELVETICA_18
@@ -223,6 +412,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
+
+    def render_text_3D(self, text, x_pos, y_pos, z_pos):
+        """Handle text drawing operations for a 3D render."""
+        GL.glDisable(GL.GL_LIGHTING)
+        GL.glRasterPos3f(x_pos, y_pos, z_pos)
+        font = GLUT.GLUT_BITMAP_HELVETICA_10
+
+        for character in text:
+            if character == '\n':
+                y_pos = y_pos - 20
+                GL.glRasterPos3f(x_pos, y_pos, z_pos)
+            else:
+                GLUT.glutBitmapCharacter(font, ord(character))
+
+        GL.glEnable(GL.GL_LIGHTING)
 
 
 class Gui(wx.Frame):
@@ -311,8 +515,10 @@ class Gui(wx.Frame):
 
         # declare bottom items
 
-        self.quit_button = wx.Button(self, wx.ID_ANY, _("Quit"))
-        self.help_button = wx.Button(self, wx.ID_ANY, _("Help"))
+        self.toggle_view_button = wx.Button(self, wx.ID_ANY, "Toggle 2D/3D")
+
+        self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
+        self.help_button = wx.Button(self, wx.ID_ANY, "Help")
 
         self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                         style=wx.TE_MULTILINE | wx.TE_READONLY)
@@ -366,6 +572,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.switch_button.Bind(wx.EVT_BUTTON, self.on_switch_button)
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_button)
         self.zap_monitor_button.Bind(wx.EVT_BUTTON, self.on_zap_button)
+        self.toggle_view_button.Bind(wx.EVT_BUTTON, self.on_toggle_view_button)
         self.quit_button.Bind(wx.EVT_BUTTON, self.on_quit_button)
         self.help_button.Bind(wx.EVT_BUTTON, self.on_help_button)
 
@@ -414,6 +621,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
 
         # place bottom items
 
+        side_sizer.Add(self.toggle_view_button, pos=(7, 0), span=(1, 1), flag=wx.TOP, border=5)
         side_sizer.Add(self.quit_button, pos=(13, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
         side_sizer.Add(self.help_button, pos=(13, 2), span=(1, 1), flag=wx.LEFT, border=5)
         side_sizer.Add(self.dialogue_box, pos=(8, 0), span=(5, 4), flag=wx.EXPAND, border=5)
@@ -433,8 +641,6 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.devices = devices
         self.monitors = monitors
         self.network = network
-
-        self.start_view = 0
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -470,7 +676,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
             if self.run_network(cycles):
                 self.cycles_completed += cycles
 
-        self.canvas.render(text)
+        self.canvas.render()
         self.dialogue_box.write("{} \n".format(text))
 
     def on_continue_button(self, event):
@@ -489,7 +695,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
                                 "Total:", str(self.cycles_completed)])
                 print(text)
 
-        self.canvas.render(text)
+        self.canvas.render()
         self.dialogue_box.write("{} \n".format(text))
 
     def on_switch_button(self, event):
@@ -561,7 +767,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
                 text = _("Error! Could not zap monitor.")
                 print(text)
 
-        self.canvas.render(text)
+        self.canvas.render()
         self.dialogue_box.write("{} \n".format(text))
 
         # reset lists available to add and zap monitors from
@@ -584,7 +790,6 @@ monitor = “monitor”, output, {output}, “;” ;"""
         except Exception:
             text = _("Error! Could not make monitor.")
             print(text)
-            # self.canvas.render(text)
             self.dialogue_box.write("{} \n".format(text))
             return False
 
@@ -624,7 +829,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
                 text = _("Error! Could not make monitor.")
                 print(text)
 
-        self.canvas.render(text)
+        self.canvas.render()
         self.dialogue_box.write("{} \n".format(text))
 
         # reset lists available to add and zap monitors from
@@ -636,6 +841,34 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.not_monitored.Clear()
         self.unmonitored_list = self.monitors.get_signal_names()[1]
         self.not_monitored.SetItems(self.unmonitored_list)
+
+    def on_toggle_view_button(self, event):
+        """Handle the user requesting to change between 2D and 3D view"""
+        text = "Toggle view button pressed"
+        self.dialogue_box.write("{} \n".format(text))
+        print(text)
+
+        # reset translation and zoom variables
+
+        self.canvas.pan_x = 0
+        self.canvas.pan_y = 0
+        self.canvas.last_mouse_x = 0
+        self.canvas.last_mouse_y = 0 
+        self.canvas.zoom = 1
+
+        # reset the scene rotation matrix
+        self.canvas.scene_rotate = np.identity(4, 'f')
+        
+        self.canvas.init = False
+
+        if self.canvas.choose_3D is False:
+            self.canvas.choose_3D = True
+        else:
+            self.canvas.choose_3D = False
+            self.canvas.__init__(self.scrollable, wx.DefaultPosition,
+                                 wx.Size(1000, 1000), self.devices, self.monitors)
+        
+        self.canvas.render()
 
     def on_quit_button(self, event):
         """Handle the event when the user clicks the quit button."""
