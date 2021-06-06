@@ -212,7 +212,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x = 10
             y = 85 + device_number*50
 
-            self.render_text_2D(monitor_name, x, y)
+            self.render_text_2D(monitor_name, x, y, False)
             margin = self.monitors.get_margin()
 
             GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
@@ -247,9 +247,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         for i in range(signal_list_length):
             x = (i * 20) + 40 + margin*10
             if i % 5 == 0:
-                self.render_text_2D(str(i), x, y)
+                self.render_text_2D(str(i), x, y, True)
             else:
-                self.render_text_2D('|', x, y)
+                self.render_text_2D('|', x, y, True)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -458,11 +458,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         self.Refresh()  # triggers the paint event
 
-    def render_text_2D(self, text, x_pos, y_pos):
+    def render_text_2D(self, text, x_pos, y_pos, text_small):
         """Handle text drawing operations for a 2D render."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_18
+        if text_small == True:
+            font = GLUT.GLUT_BITMAP_HELVETICA_12
+        else:
+            font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
