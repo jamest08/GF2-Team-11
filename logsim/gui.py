@@ -248,7 +248,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x = (i * 20) + 40 + margin*10
             self.render_text_2D('|', x, y, True)
             if i % 5 == 0:
-                self.render_text_2D(str(i), x-2, y+10, True)
+                self.render_text_2D(str(i), x-2, y+20, True)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
