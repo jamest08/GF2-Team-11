@@ -4,6 +4,7 @@ import wx
 from wx.core import BoxSizer
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
+import builtins
 
 import sys
 import os
@@ -37,6 +38,7 @@ def gui():
     parser = Parser(names, devices, network, monitors, scanner)
     parser.parse_network()
     app = wx.App()
+    builtins._ = wx.GetTranslation
     g = Gui("Logic Simulator", path, names, devices, network,
             monitors)
     g.Show(False)
@@ -105,12 +107,6 @@ def test_monitor_changes(gui):
 
     switch_id = gui.switches_id_list[0]
     assert (switch_id, None) in gui.monitors.monitors_dictionary
-
-
-def test_quit(gui):
-    "Test the quit button functions as expected."
-    with pytest.raises(SystemExit):
-            gui.on_quit_button(True)
 
 
 """
