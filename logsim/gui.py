@@ -462,7 +462,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations for a 2D render."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_18
+        font = GLUT.GLUT_BITMAP_HELVETICA_10
 
         for character in text:
             if character == '\n':
@@ -524,12 +524,12 @@ class Gui(wx.Frame):
         fileMenu.Append(wx.ID_ABOUT, _("&About"))
         fileMenu.Append(wx.ID_EXIT, _("&Exit"))
 
-        helpMenu.SetTitle("Help")
-        helpMenu.Append(wx.ID_HELP, "&Help")
+        helpMenu.SetTitle(_("Help"))
+        helpMenu.Append(wx.ID_HELP, _("&Help"))
         helpMenu.Append(wx.ID_HELP_CONTEXT, "&EBNF")
 
         menuBar.Append(fileMenu, _("&File"))
-        menuBar.Append(helpMenu, "&Help")
+        menuBar.Append(helpMenu, _("&Help"))
         self.SetMenuBar(menuBar)
 
         # set scrollable area for canvas
@@ -724,14 +724,14 @@ Paragraph comments must be enclosed between two '#' characters.
         if Id == wx.ID_ABOUT:
             wx.MessageBox("""Logic Simulator
                           \nCreated by James Thompson, Anna Mills and Neelay Sant\n2021""",
-                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
+                          _("About Logsim"), wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
         spin_value = self.spin.GetValue()
         self.spin_value = spin_value
         text = "".join(["New spin control value: ", str(spin_value)])
-        self.dialogue_box.write("{} \n".format(text))
+        self.dialogue_box.write(_("New spin control value: {} \n").format(str(spin_value)))
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button.
@@ -750,7 +750,7 @@ Paragraph comments must be enclosed between two '#' characters.
                 self.cycles_completed += cycles
 
         self.canvas.render()
-        self.dialogue_box.write("{} \n".format(text))
+        self.dialogue_box.write(_("Running for {} cycles\n").format(str(cycles)))
 
     def on_continue_button(self, event):
         """Handle the event when the user clicks the continue button.
@@ -760,7 +760,7 @@ Paragraph comments must be enclosed between two '#' characters.
         cycles = self.spin_value
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
-                text = _("Error! Nothing to continue. Run first.")
+                text = "Error! Nothing to continue. Run first."
                 print(text)
             elif self.run_network(cycles):
                 self.cycles_completed += cycles
@@ -769,7 +769,7 @@ Paragraph comments must be enclosed between two '#' characters.
                 print(text)
 
         self.canvas.render()
-        self.dialogue_box.write("{} \n".format(text))
+        self.dialogue_box.write(_("Continuing for {} cycles. \nTotal: {} \n").format(str(cycles), str(self.cycles_completed)))
 
     def on_switch_button(self, event):
         """Handle the event when the user clicks the switch button.
@@ -917,7 +917,7 @@ Paragraph comments must be enclosed between two '#' characters.
 
     def on_toggle_view_button(self, event):
         """Handle the user requesting to change between 2D and 3D view"""
-        text = "Toggle view button pressed"
+        text = _("Toggle view button pressed")
         self.dialogue_box.write("{} \n".format(text))
         print(text)
 

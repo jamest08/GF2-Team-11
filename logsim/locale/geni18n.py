@@ -35,14 +35,14 @@ pyGettext = os.path.join(pyI18nFolder, 'pygettext.py')
 pyMsgfmt = os.path.join(pyI18nFolder, 'msgfmt.py')
 outFolder = os.path.join(appFolder, 'locale')
 
-tCmd = pyExe + ' ' + pyGettext + ' ' + "-o parse.po parse.py"
-"""
+tCmd = pyExe + ' ' + pyGettext + ' ' + "-o jap.po gui.py"
+
 # build command for pygettext
-gtOptions = '-a -d %s -o %s.pot -p %s %s'
-tCmd = pyExe + ' ' + pyGettext + ' ' + (gtOptions % ("jap",
-                                                     "jap",
-                                                     outFolder,
-                                                     appFolder))"""
+#gtOptions = '-a -d %s -o %s.pot -p %s %s'
+#tCmd = pyExe + ' ' + pyGettext + ' ' + (gtOptions % ("jap",
+                                                    # "jap",
+                                                    # outFolder,
+                                                   #  appFolder))
 print ("Generating the .pot file")
 print ("cmd: %s" % tCmd)
 rCode = subprocess.call(tCmd)
@@ -52,7 +52,7 @@ print ("return code: %s\n\n" % rCode)
 tLang = wx.LANGUAGE_JAPANESE
 # build command for msgfmt
 langDir = os.path.join(appFolder, ('locale'))
-poFile = os.path.join(langDir, "parse" + '.po')
+poFile = os.path.join(langDir, "jap" + '.po')
 tCmd = pyExe + ' ' + pyMsgfmt + ' ' + poFile
     
 print ("Generating the .mo file")

@@ -5,159 +5,195 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-06-05 16:15+0100\n"
-"PO-Revision-Date: 2021-06-05 17:48+0100\n"
+"POT-Creation-Date: 2021-06-06 14:43+0100\n"
+"PO-Revision-Date: 2021-06-06 14:47+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ja_JP\n"
+"Language: ja\n"
 "X-Generator: Poedit 3.0\n"
-"X-Poedit-SourceCharset: UTF-8\n"
 
-#: gui.py:477
-msgid "&EBNF"
-msgstr "&EBNF"
-
-#: gui.py:478
+#: gui.py:523
 msgid "File"
 msgstr "ファイル"
 
-#: gui.py:479
+#: gui.py:524
+msgid "&About"
+msgstr "&約"
+
+#: gui.py:525
 msgid "&Exit"
 msgstr "&出口"
 
-#: gui.py:480
-msgid "&File"
-msgstr "ファイル"
-
-#: gui.py:492
-msgid "Run Simulation"
-msgstr "シミュレーションを開始"
-
-#: gui.py:494
-msgid "Run"
-msgstr "開始"
-
-#: gui.py:495
-msgid "Continue"
-msgstr "継続する"
-
-#: gui.py:499
-msgid "Manage Switches"
-msgstr "スイッチを管理する"
-
-#: gui.py:509
-msgid "Switch"
-msgstr "スイッチ"
-
-#: gui.py:513
-msgid "Manage Monitors"
-msgstr "モニターを管理する"
-
-#: gui.py:521
-msgid "Add"
-msgstr "追加"
-
-#: gui.py:522
-msgid "Zap"
-msgstr "削除する"
-
-#: gui.py:526
-msgid "Toggle 2D/3D"
-msgstr "変化する 2D/3D"
-
-#: gui.py:528
-msgid "Quit"
-msgstr "見切り"
-
-#: gui.py:529
+#: gui.py:527
 msgid "Help"
 msgstr "助けて"
 
-#: gui.py:534
+#: gui.py:528 gui.py:532
+msgid "&Help"
+msgstr "&助けて"
+
+#: gui.py:531
+msgid "&File"
+msgstr "ファイル"
+
+#: gui.py:544
+msgid "Run Simulation"
+msgstr "シミュレーションを開始"
+
+#: gui.py:546
+msgid "Run"
+msgstr "開始"
+
+#: gui.py:547
+msgid "Continue"
+msgstr "継続する"
+
+#: gui.py:551
+msgid "Manage Switches"
+msgstr "スイッチを管理する"
+
+#: gui.py:561
+msgid "Switch"
+msgstr "スイッチ"
+
+#: gui.py:565
+msgid "Manage Monitors"
+msgstr "モニターを管理する"
+
+#: gui.py:573
+msgid "Add"
+msgstr "追加"
+
+#: gui.py:574
+msgid "Zap"
+msgstr "削除する"
+
+#: gui.py:578
+msgid "Toggle 2D/3D"
+msgstr "変化する 2D/3D"
+
+#: gui.py:582
 msgid ""
 "HELP MENU: \n"
 "\n"
-"        To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n"
+"To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n"
 "\n"
-"        To continue the simulation for N cycles, select N with the scroll menu.\n"
-"        Then click 'Continue'. \n"
+"To continue the simulation for N cycles, select N with the scroll menu.\n"
+"Then click 'Continue'. \n"
 "\n"
-"        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.\n"
-"        Then select a state for the switch to be in. Then click 'Switch'. \n"
+"To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.\n"
+"Then select a state for the switch to be in. Then click 'Switch'. \n"
 "\n"
-"        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.\n"
-"        Then click 'Zap'. \n"
+"To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.\n"
+"Then click 'Zap'. \n"
 "\n"
-"        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.\n"
-"        Then click 'Add'. \n"
+"To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.\n"
+"Then click 'Add'. \n"
 "\n"
-"        To quit the program, click quit. "
+"To toggle between the 2D and 3D view, click the 'toggle 2D/3D' button.\n"
+"It is located in the bottom left of the window. \n"
+"\n"
+"When in 2D view, holding 'left' or 'right' click and dragging will translate the view. \n"
+"\n"
+"When in 3D view, holding 'right click' and dragging will translate the view.\n"
+"Holding 'left click' and dragging will rotate the view. \n"
+"\n"
+"Scrolling in either view will zoom in and out."
 msgstr ""
-"助けて:\n"
+"ヘルプメニュー:\n"
 "\n"
 "N サイクルのシミュレーションを実行するには、スクロール メニューで N を選択し、[実行] をクリックします。\n"
 "\n"
 "N サイクルのシミュレーションを続行するには、スクロール メニューで N を選択します。\n"
-"次に、続行 ボタンをクリックします.\n"
+"次に、[続行] をクリックします。\n"
 "\n"
-"\n"
-"スイッチを切り替えるには、スイッチの管理 ドロップダウン メニューからスイッチを選択します。\n"
+"スイッチを切り替えるには、[スイッチの管理] ドロップダウン メニューからスイッチを選択します。\n"
 "次に、スイッチの状態を選択します。次に、[スイッチ] をクリックします。\n"
 "\n"
 "モニター ポイントを削除するには、最初の [モニターの管理] ドロップダウン メニューから 1 つを選択します。\n"
-"\n"
-"削除 をクリックします。\n"
+"次に、「ザップ」をクリックします。\n"
 "\n"
 "モニター ポイントを追加するには、2 番目の [モニターの管理] ドロップダウン メニューから 1 つを選択します。\n"
 "次に、[追加] をクリックします。\n"
 "\n"
-"プログラムを終了するには、[終了] をクリックします "
+"2D ビューと 3D ビューを切り替えるには、[2D/3D の切り替え] ボタンをクリックします。\n"
+"ウィンドウの左下にあります。\n"
+"\n"
+"2D ビューで「左」または「右」クリックを押しながらドラッグすると、ビューが移動します。\n"
+"\n"
+"3D ビューで「右クリック」を押しながらドラッグすると、ビューが移動します。\n"
+"「左クリック」を押しながらドラッグすると、ビューが回転します。\n"
+"\n"
+"いずれかのビューでスクロールすると、ズームインおよびズームアウトします。"
 
-#: gui.py:663
+#: gui.py:712
+msgid "menu button pressed"
+msgstr "ヘルプボタンが押されました."
+
+#: gui.py:718
 msgid "Rules for the user definition file."
 msgstr "ユーザー定義ファイルのルール."
 
-#: gui.py:700
-msgid "Error! Nothing to continue. Run first."
-msgstr "エラー！最初に実行します。"
-
-#: gui.py:724
-msgid "Successfully set switch."
-msgstr "見事にスイッチ交換。"
-
-#: gui.py:727
-msgid "Error! Invalid switch."
-msgstr "エラー！無効なスイッチです。"
-
-#: gui.py:740 gui.py:777
-msgid "Error! Could not zap monitor."
-msgstr "エラー！このモニターを削除できませんでした。"
-
-#: gui.py:774
-msgid "Successfully zapped monitor"
-msgstr "モニターが正常に削除されました"
-
-#: gui.py:801 gui.py:839
-msgid "Error! Could not make monitor."
-msgstr "エラー！モニターできませんでした."
-
-#: gui.py:836
-msgid "Successfully made monitor."
-msgstr "モニターの作成に成功しました。"
-
-#: gui.py:885
-msgid "Quitting program."
-msgstr "プログラムを終了する."
-
-#: gui.py:890
+#: gui.py:721
 msgid "Help button pressed."
 msgstr "ヘルプボタンが押されました."
 
-#: gui.py:904
+#: gui.py:727
+msgid "About Logsim"
+msgstr "約 Logsim"
+
+#: gui.py:734
+msgid "New spin control value: {} \n"
+msgstr "新しいスピン制御値: {}\n"
+
+#: gui.py:753
+msgid "Running for {} cycles\n"
+msgstr "{} サイクル実行\n"
+
+#: gui.py:763
+msgid "Error! Nothing to continue. Run first."
+msgstr "エラー！最初に実行します。"
+
+#: gui.py:772
+msgid ""
+"Continuing for {} cycles. \n"
+"Total: {} \n"
+msgstr ""
+"{}サイクル継続.\n"
+"合計: {}\n"
+
+#: gui.py:787
+msgid "Successfully set switch."
+msgstr "見事にスイッチ交換。"
+
+#: gui.py:790
+msgid "Error! Invalid switch."
+msgstr "エラー！無効なスイッチです。"
+
+#: gui.py:803 gui.py:840
+msgid "Error! Could not zap monitor."
+msgstr "エラー！このモニターを削除できませんでした。"
+
+#: gui.py:837
+msgid "Successfully zapped monitor"
+msgstr "モニターが正常に削除されました"
+
+#: gui.py:864 gui.py:902
+msgid "Error! Could not make monitor."
+msgstr "エラー！モニターできませんでした."
+
+#: gui.py:899
+msgid "Successfully made monitor."
+msgstr "モニターの作成に成功しました。"
+
+#: gui.py:920
+msgid "Toggle view button pressed"
+msgstr "ヘルプボタンが押されました."
+
+#: gui.py:957
 msgid "Error! Network oscillating."
 msgstr "エラー！ネットワーク振動。"
