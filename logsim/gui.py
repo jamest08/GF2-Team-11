@@ -580,16 +580,21 @@ class Gui(wx.Frame):
                                         style=wx.TE_MULTILINE | wx.TE_READONLY)
 
         self.help_text = _(u"""HELP MENU: \n
-        To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
-        To continue the simulation for N cycles, select N with the scroll menu.
-        Then click 'Continue'. \n
-        To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.
-        Then select a state for the switch to be in. Then click 'Switch'. \n
-        To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.
-        Then click 'Zap'. \n
-        To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.
-        Then click 'Add'. \n
-        To quit the program, click quit. """)
+To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
+To continue the simulation for N cycles, select N with the scroll menu.
+Then click 'Continue'. \n
+To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.
+Then select a state for the switch to be in. Then click 'Switch'. \n
+To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.
+Then click 'Zap'. \n
+To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.
+Then click 'Add'. \n
+To toggle between the 2D and 3D view, click the 'toggle 2D/3D' button.
+It is located in the bottom left of the window. \n
+When in 2D view, holding 'left' or 'right' click and dragging will translate the view. \n
+When in 3D view, holding 'right click' and dragging will translate the view.
+Holding 'left click' and dragging will rotate the view. \n
+Scrolling in either view will zoom in and out.""")
 
         self.EBNF_text = """EBNF RULES:
 
@@ -606,17 +611,25 @@ letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
 
 file = {definition | connection | monitor}, "END" ;
 
-definition =  “define”, name, {name}, “as”, (“XOR” | “DTYPE” | switch | gate | clock), “;” ;
+definition =  “define”, name, {name}, “as”,
+ ( “XOR” | “DTYPE” | switch | gate | clock | generator), “;” ;
+name = letter, {letter | digit} ;
 switch = “SWITCH”, (“0” | “1”), “state” ;
 gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
 clock = “CLOCK”, “period”, digit, {digit} ;
-name = letter, {letter | digit} ;
+generator = "SIGGEN", ("0"|"1"), "for", digit, {digit}, "cycles",
+{("0" | "1"), "for", digit, {digit}, "cycles"} ;
 
 connection = “connect”, output, “to”, input, “;” ;
 output = name, [“.Q” | “.QBAR”] ;
 input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
 
-monitor = “monitor”, output, {output}, “;” ;"""
+monitor = “monitor”, output, {output}, “;” ;
+
+Comments:
+Line comments must be started with a '%' and ended by a newline.
+Paragraph comments must be enclosed between two '#' characters.
+"""
 
         # Bind events to widgets
 
@@ -675,7 +688,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
 
         # place bottom items
 
-        side_sizer.Add(self.toggle_view_button, pos=(7, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
+        side_sizer.Add(self.toggle_view_button, pos=(13, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
         side_sizer.Add(self.dialogue_box, pos=(8, 0), span=(5, 4), flag=wx.EXPAND, border=5)
 
         self.SetSizeHints(600, 530)  # minimum size of entire window
