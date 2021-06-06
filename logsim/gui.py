@@ -186,6 +186,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
         GL.glMultMatrixf(self.scene_rotate)
         GL.glScalef(self.zoom, self.zoom, self.zoom)
+        GL.glRotatef(45, 1, 1, 0)
 
     def render(self):
         """Handle directing render command to the 2D or 3D handler."""
