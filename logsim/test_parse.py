@@ -55,8 +55,10 @@ def test_error_type(parser):
     assert parser[0].scanner.error_message_list == []
     assert parser[1].scanner.error_message_list == ["Invalid symbol for start of line.",
                                                     "The following inputs are floating: ['G1.I1']"]
-    assert ("Expected 0 or 1 for switch state" and "Number of inputs must be integer in range(1, 17)" and
-            "Unexpected dot. Can only specify port for DTYPE." in parser[3].scanner.error_message_list)
+    assert ("Expected 0 or 1 for switch state" and
+            "Number of inputs must be integer in range(1, 17)" and
+            "Unexpected dot. Can only specify port for DTYPE."
+            in parser[3].scanner.error_message_list)
     assert 'Invalid name, may be keyword' in parser[3].scanner.error_message_list
     assert "Expected 0 or 1 or keyword 'waveform'" in parser[5].scanner.error_message_list
 

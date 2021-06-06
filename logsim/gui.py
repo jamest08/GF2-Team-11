@@ -922,7 +922,7 @@ Paragraph comments must be enclosed between two '#' characters.
         self.not_monitored.SetItems(self.unmonitored_list)
 
     def on_toggle_view_button(self, event):
-        """Handle the user requesting to change between 2D and 3D view"""
+        """Handle the user requesting to change between 2D and 3D view."""
         text = _("Toggle view button pressed")
         self.dialogue_box.write("{} \n".format(text))
         print(text)

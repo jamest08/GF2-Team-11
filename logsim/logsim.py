@@ -75,7 +75,7 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
 
-            #internationalisation
+            # internationalisation
             builtins._ = wx.GetTranslation
             locale = wx.Locale()
             if os.getenv('LANG') == "ja_JP.UTF-8":
@@ -87,7 +87,7 @@ def main(arg_list):
                 del locale
                 locale = wx.Locale()
                 locale.Init(wx.LANGUAGE_DEFAULT)
-                
+
             locale.AddCatalogLookupPathPrefix('./locale')
             locale.AddCatalog('jap')
 
@@ -99,4 +99,3 @@ def main(arg_list):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-    
