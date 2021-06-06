@@ -173,13 +173,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Viewing transformation - set the viewpoint back from the scene
         # Translate the waveforms to start in the top left hand corner
 
-        GL.glTranslatef(-350, 350, -self.depth_offset)
+        GL.glTranslatef(0, 0, -self.depth_offset)
 
         # rotate the waveforms to start a viewable angle
 
-        x = 40
-        y = 40
-        GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
+        # x = 40
+        # y = 40
+        # GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
 
         # Modelling transformation - pan, zoom and rotate
 
@@ -266,35 +266,55 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
+        # configure range in x to keep origin in the center of the signals
+
+        num_devices = len(self.monitors.monitors_dictionary)
+        start_index_devices = -(num_devices//2)
+        if num_devices % 2 == 0:
+            end_index_devices = -start_index_devices
+        else:
+            end_index_devices = -start_index_devices + 1
+        device_range = range(start_index_devices, end_index_devices)
+
+        # for each device, plot its name and waveform.
+
         device_number = 0
         margin = self.monitors.get_margin()
 
         for device_id, output_id in self.monitors.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
+            signal_list_length = len(signal_list)
 
-            x = device_number * 20
-            self.render_text_3D(monitor_name, x, 0, 0)
-            GL.glColor3f(0.7, 0.2, 1)  # signal trace is purple
+            # configure range in z to keep origin in the center of the signals
+
+            start_index_signal = -(signal_list_length//2)
+            if signal_list_length % 2 == 0:
+                end_index_signal = -start_index_signal
+            else:
+                end_index_signal = -start_index_signal + 1
+            signal_range = range(start_index_signal, end_index_signal)
 
             # draw signal according to list of states
 
-            signal_list_length = len(signal_list)
+            x = device_range[device_number] * 20
+            self.render_text_3D(monitor_name, x, 0, start_index_signal * 20 - 20 - margin*10)
 
+            GL.glColor3f(0.7, 0.2, 1)  # signal trace is purple
             for i in range(signal_list_length):
-                z = i * 20
+                z = signal_range[i] * 20
                 if signal_list[i] == self.devices.LOW:
-                    self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 1)
+                    self.draw_cuboid(x, z, 5, 10, 1)
                 elif signal_list[i] == self.devices.HIGH:
-                    self.draw_cuboid(x, z + 20 + margin*10, 5, 10, 11)
+                    self.draw_cuboid(x, z, 5, 10, 11)
 
             device_number += 1
         
         # draw axis for number of cycles.
 
         for i in range(signal_list_length):
-            z = i * 20
-            self.render_text_3D(str(i), -20, 0, z + 10 + margin*10)
+            z = signal_range[i] * 20
+            self.render_text_3D(str(i), (device_range[0]-1)*20, 0, z - 10)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -563,10 +583,6 @@ class Gui(wx.Frame):
         # declare bottom items
 
         self.toggle_view_button = wx.Button(self, wx.ID_ANY, _("Toggle 2D/3D"))
-
-        self.quit_button = wx.Button(self, wx.ID_ANY, _("Quit"))
-        self.help_button = wx.Button(self, wx.ID_ANY, _("Help"))
-
         self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                         style=wx.TE_MULTILINE | wx.TE_READONLY)
 
@@ -620,8 +636,6 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.add_monitor_button.Bind(wx.EVT_BUTTON, self.on_add_button)
         self.zap_monitor_button.Bind(wx.EVT_BUTTON, self.on_zap_button)
         self.toggle_view_button.Bind(wx.EVT_BUTTON, self.on_toggle_view_button)
-        self.quit_button.Bind(wx.EVT_BUTTON, self.on_quit_button)
-        self.help_button.Bind(wx.EVT_BUTTON, self.on_help_button)
 
         # Configure sizers for layout
 
@@ -668,9 +682,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
 
         # place bottom items
 
-        side_sizer.Add(self.toggle_view_button, pos=(7, 0), span=(1, 1), flag=wx.TOP, border=5)
-        side_sizer.Add(self.quit_button, pos=(13, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
-        side_sizer.Add(self.help_button, pos=(13, 2), span=(1, 1), flag=wx.LEFT, border=5)
+        side_sizer.Add(self.toggle_view_button, pos=(7, 0), span=(1, 1), flag=wx.BOTTOM, border=5)
         side_sizer.Add(self.dialogue_box, pos=(8, 0), span=(5, 4), flag=wx.EXPAND, border=5)
 
         self.SetSizeHints(600, 530)  # minimum size of entire window
@@ -860,7 +872,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
             elif i.isalnum() is True:
                 port_name_list.append(i)
             else:
-                is_device = 0
+                is_device = False
 
         device_name = ''.join(device_name_list)
         port_name = ''.join(port_name_list)
@@ -914,30 +926,19 @@ monitor = “monitor”, output, {output}, “;” ;"""
 
         # reset the scene rotation matrix
         self.canvas.scene_rotate = np.identity(4, 'f')
-        
         self.canvas.init = False
-        
+
         # handle the change of view
 
         if self.canvas.choose_3D is False:
             self.canvas.choose_3D = True
+            self.canvas.pan_x = -300
+            self.canvas.pan_y = 300
         else:
             self.canvas.choose_3D = False
             self.canvas.__init__(self.scrollable, wx.DefaultPosition,
                                  wx.Size(1000, 1000), self.devices, self.monitors)
         self.canvas.render()
-
-    def on_quit_button(self, event):
-        """Handle the event when the user clicks the quit button."""
-        print(_("Quitting program."))
-        sys.exit()
-
-    def on_help_button(self, event):
-        """Handle the event when the user clicks the reset button."""
-        text = _("Help button pressed.")
-
-        self.dialogue_box.write("{} \n \n".format(text))
-        self.dialogue_box.write("{} \n \n".format(self.help_text))
 
     def run_network(self, cycles):
         """Run the network for the specified number of simulation cycles.

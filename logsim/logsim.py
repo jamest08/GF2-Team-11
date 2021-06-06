@@ -14,6 +14,7 @@ import getopt
 import sys
 import builtins
 import wx
+import os
 
 from names import Names
 from devices import Devices
@@ -77,7 +78,18 @@ def main(arg_list):
             #internationalisation
             builtins._ = wx.GetTranslation
             locale = wx.Locale()
-            locale.Init(wx.LANGUAGE_DEFAULT)
+            if os.environ['LANG'] == "ja_JP.UTF-8":
+
+                locale.Init(wx.LANGUAGE_JAPANESE)
+            else:
+                locale.Init(wx.LANGUAGE_DEFAULT)
+            if not wx.Locale.IsOk(locale):
+                del locale
+                locale = wx.Locale()
+                locale.Init(wx.LANGUAGE_DEFAULT)
+            print(locale.GetLanguageCanonicalName(locale.GetSystemLanguage()))
+            print(os.environ['LANG'])
+                
             locale.AddCatalogLookupPathPrefix('./locale')
             locale.AddCatalog('jap')
 
