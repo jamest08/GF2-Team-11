@@ -462,7 +462,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations for a 2D render."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        if text_small == True:
+        if text_small is True:
             font = GLUT.GLUT_BITMAP_HELVETICA_12
         else:
             font = GLUT.GLUT_BITMAP_HELVETICA_18
@@ -719,12 +719,12 @@ Paragraph comments must be enclosed between two '#' characters.
         if Id == wx.ID_HELP_CONTEXT:
             text = "EBNF Button Pressed"
             self.dialogue_box.write("{} \n \n".format(text))
-            ebnf_box = wx.GenericMessageDialog(None, "EBNF Rules",
-                                        "Rules for the User Definition File",
-                                        wx.ICON_INFORMATION)
-            ebnf_box.SetExtendedMessage(self.EBNF_text)
+            ebnf_box = wx.GenericMessageDialog(None, self.EBNF_text,
+                                               _("Rules for the user definition file."),
+                                               wx.ICON_INFORMATION)
+            # ebnf_box.SetExtendedMessage(self.EBNF_text)
             ebnf_box.ShowModal()
-            
+
         if Id == wx.ID_HELP:
             text = _("Help button pressed.")
             self.dialogue_box.write("{} \n \n".format(text))
@@ -768,16 +768,15 @@ Paragraph comments must be enclosed between two '#' characters.
         cycles = self.spin_value
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
-                text = "Error! Nothing to continue. Run first."
-                print(text)
+                text = "Error! Nothing to continue. Run first.\n"
             elif self.run_network(cycles):
                 self.cycles_completed += cycles
-                text = " ".join(["Continuing for", str(cycles), "cycles.",
-                                "Total:", str(self.cycles_completed)])
-                print(text)
+                text = _("Continuing for {} cycles. \nTotal: {} \n").format(
+                    str(cycles), str(self.cycles_completed))
 
+        print(text)
         self.canvas.render()
-        self.dialogue_box.write(_("Continuing for {} cycles. \nTotal: {} \n").format(str(cycles), str(self.cycles_completed)))
+        self.dialogue_box.write(text)
 
     def on_switch_button(self, event):
         """Handle the event when the user clicks the switch button.
