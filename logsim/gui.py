@@ -12,7 +12,6 @@ import wx
 import gettext
 
 import wx.glcanvas as wxcanvas
-import wx.lib.agw.genericmessagedialog as GMD
 import numpy as np
 import math
 import os
@@ -244,12 +243,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             device_number += 1
 
         # draw x axis
-
-        x = 10
         y = 85 + (device_number)*50
         for i in range(signal_list_length):
             x = (i * 20) + 40 + margin*10
-            self.render_text_2D(str(i), x, y)
+            if i % 5 == 0:
+                self.render_text_2D(str(i), x, y)
+            else:
+                self.render_text_2D('|', x, y)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -462,7 +462,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations for a 2D render."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_10
+        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
