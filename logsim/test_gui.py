@@ -108,7 +108,6 @@ def test_monitor_changes(gui):
     switch_id = gui.switches_id_list[0]
     assert (switch_id, None) in gui.monitors.monitors_dictionary
 
-
 """
 Manual Tests
 
