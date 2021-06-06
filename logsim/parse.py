@@ -38,6 +38,13 @@ class Parser:
     Public methods
     --------------
     parse_network(self): Parses the circuit definition file.
+
+    Private methods
+    --------------
+    __name(self): Check symbol has NAME type.
+    __device(self, name_ids): Define devices using Devices class.
+    __output(self): Check expected output in file follows correct syntax.
+    __input(self): Check expected input in file follows correct syntax.
     """
 
     def __init__(self, names, devices, network, monitors, scanner):
@@ -65,13 +72,13 @@ class Parser:
             elif self.current_symbol.id == self.names.query('define'):
                 name_ids = []  # names for identical devices to be defined
                 self.current_symbol = self.scanner.get_symbol()
-                if not self.name():  # check valid name
+                if not self.__name():  # check valid name
                     continue
                 name_ids.append(self.current_symbol.id)
                 self.current_symbol = self.scanner.get_symbol()
                 need_continue = False  # True if error found in following loop.
                 while self.current_symbol.id != self.names.query('as'):
-                    if not self.name():
+                    if not self.__name():
                         need_continue = True
                         break
                     else:
@@ -80,20 +87,20 @@ class Parser:
                 if need_continue:  # skip to next line
                     continue
                 self.current_symbol = self.scanner.get_symbol()
-                if not self.device(name_ids):
+                if not self.__device(name_ids):
                     continue
                 self.current_symbol = self.scanner.get_symbol()
 
             elif self.current_symbol.id == self.names.query('connect'):
                 self.current_symbol = self.scanner.get_symbol()
-                [output_id, output_port_id] = self.output()
+                [output_id, output_port_id] = self.__output()
                 if output_id is None:  # if error found, skip line
                     continue
                 if self.current_symbol.id != self.names.query('to'):
                     self.scanner.display_error("Expected keyword 'to'.")
                     continue
                 self.current_symbol = self.scanner.get_symbol()
-                [input_id, input_port_id] = self.input()
+                [input_id, input_port_id] = self.__input()
                 if input_id is None:  # if error found, skip line
                     continue
                 error_type = self.network.make_connection(output_id, output_port_id,
@@ -107,7 +114,7 @@ class Parser:
                 self.current_symbol = self.scanner.get_symbol()
                 need_continue = False
                 while self.current_symbol.id != self.names.query(';'):
-                    [output_id, output_port_id] = self.output()
+                    [output_id, output_port_id] = self.__output()
                     if output_id is None:  # if error found, skip line
                         need_continue = True
                         break
@@ -153,7 +160,7 @@ class Parser:
         else:
             return False
 
-    def name(self):
+    def __name(self):
         """Check symbol has NAME type.
 
         Return True if NAME type, False otherwise.
@@ -164,7 +171,7 @@ class Parser:
         else:
             return True
 
-    def device(self, name_ids):
+    def __device(self, name_ids):
         """Define devices using Devices class.
 
         Accepts list of names to be defined.
@@ -277,7 +284,7 @@ class Parser:
 
         return True
 
-    def output(self):
+    def __output(self):
         """Check expected output in file follows correct syntax.
 
         Return [device_id, port_id] of output.  port_id is None for
@@ -308,7 +315,7 @@ class Parser:
         return [name_id, port_id]
         # at this point, current symbol is symbol after output
 
-    def input(self):
+    def __input(self):
         """Check expected input in file follows correct syntax.
 
         Return [device_id, port_id] of input or [None, None] if

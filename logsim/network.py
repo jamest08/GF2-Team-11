@@ -56,6 +56,9 @@ class Network:
     update_clocks(self): If it is time to do so, sets clock signals to RISING
                          or FALLING.
 
+    update_siggens(self): If it is time to do so, set sig. gen. signals to RISING
+                          or FALLING.
+
     execute_network(self): Executes all the devices in the network for one
                            simulation cycle.
     """

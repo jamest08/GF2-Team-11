@@ -85,6 +85,9 @@ class Devices:
     make_clock(self, device_id, clock_half_period): Makes a clock device with
                                                     the specified half period.
 
+    make_siggen(self, device_id, waveform): Make a signal generator device with
+                                            the specified waveform.
+
     make_gate(self, device_id, device_kind, no_of_inputs): Makes logic gates
                                         with the specified number of inputs.
 
