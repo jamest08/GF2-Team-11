@@ -717,7 +717,7 @@ Paragraph comments must be enclosed between two '#' characters.
             self.Close(True)
         if Id == wx.ID_HELP_CONTEXT:
             text = "EBNF Button Pressed"
-            self.dialogue_box.write("{} \n \n".format(text))
+            self.write_to_dialogue(text)
             ebnf_box = wx.GenericMessageDialog(None, self.EBNF_text,
                                                _("Rules for the user definition file."),
                                                wx.ICON_INFORMATION)
@@ -737,8 +737,8 @@ Paragraph comments must be enclosed between two '#' characters.
         """Handle the event when the user changes the spin control value."""
         spin_value = self.spin.GetValue()
         self.spin_value = spin_value
-        text = "".join(["New spin control value: ", str(spin_value)])
-        self.dialogue_box.write(_("New spin control value: {} \n").format(str(spin_value)))
+        text = _("New spin control value: {} \n").format(str(spin_value))
+        self.write_to_dialogue(text)
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button.
@@ -750,14 +750,13 @@ Paragraph comments must be enclosed between two '#' characters.
 
         if cycles is not None:  # if the number of cycles provided is valid
             self.monitors.reset_monitors()
-            text = "".join(["Running for ", str(cycles), " cycles"])
-            print(text)
+            text = _("Running for {} cycles\n").format(str(cycles))
             self.devices.cold_startup()
             if self.run_network(cycles):
                 self.cycles_completed += cycles
 
         self.canvas.render()
-        self.dialogue_box.write(_("Running for {} cycles\n").format(str(cycles)))
+        self.write_to_dialogue(text)
 
     def on_continue_button(self, event):
         """Handle the event when the user clicks the continue button.
@@ -773,9 +772,8 @@ Paragraph comments must be enclosed between two '#' characters.
                 text = _("Continuing for {} cycles. \nTotal: {} \n").format(
                     str(cycles), str(self.cycles_completed))
 
-        print(text)
         self.canvas.render()
-        self.dialogue_box.write(text)
+        self.write_to_dialogue(text)
 
     def on_switch_button(self, event):
         """Handle the event when the user clicks the switch button.
@@ -791,12 +789,10 @@ Paragraph comments must be enclosed between two '#' characters.
             if switch_state is not None:
                 if self.devices.set_switch(switch_id, switch_state):
                     text = _("Successfully set switch.")
-                    print(text)
                 else:
                     text = _("Error! Invalid switch.")
-                    print(text)
 
-        self.dialogue_box.write("{} \n".format(text))
+        self.write_to_dialogue(text)
 
     def on_zap_button(self, event):
         """Handle the event when the user clicks the run button.
@@ -807,33 +803,10 @@ Paragraph comments must be enclosed between two '#' characters.
             monitor_name = self.monitored.GetString(self.monitored.GetSelection())
         except Exception:
             text = _("Error! Could not zap monitor.")
-            print(text)
-            self.dialogue_box.write("{} \n".format(text))
+            self.write_to_dialogue(text)
             return False
 
-        # extract monitor's device and port IDs.
-
-        device_name_list = []
-        port_name_list = []
-        is_device = True  # keep track of when '.' is hit.
-        for i in monitor_name:
-            if i.isalnum() is True and is_device is True:
-                device_name_list.append(i)
-            elif i.isalnum() is True:
-                port_name_list.append(i)
-            else:
-                is_device = 0
-
-        device_name = ''.join(device_name_list)
-        port_name = ''.join(port_name_list)
-
-        device_id = self.names.query(device_name)
-        if port_name == '':
-            port_id = None
-        else:
-            port_id = self.names.query(port_name)
-
-        monitor = [device_id, port_id]
+        monitor = self.get_monitor_IDs(monitor_name)
 
         # attempt to zap monitor once IDs have been found.
 
@@ -841,23 +814,12 @@ Paragraph comments must be enclosed between two '#' characters.
             [device, port] = monitor
             if self.monitors.remove_monitor(device, port):
                 text = _("Successfully zapped monitor")
-                print(text)
             else:
                 text = _("Error! Could not zap monitor.")
-                print(text)
 
         self.canvas.render()
-        self.dialogue_box.write("{} \n".format(text))
-
-        # reset lists available to add and zap monitors from
-
-        self.monitored.Clear()
-        self.monitored_list = self.monitors.get_signal_names()[0]
-        self.monitored.SetItems(self.monitored_list)
-
-        self.not_monitored.Clear()
-        self.unmonitored_list = self.monitors.get_signal_names()[1]
-        self.not_monitored.SetItems(self.unmonitored_list)
+        self.write_to_dialogue(text)
+        self.reset_monitor_lists()
 
     def on_add_button(self, event):
         """Handle the event when the user clicks the run button.
@@ -868,11 +830,29 @@ Paragraph comments must be enclosed between two '#' characters.
             monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
         except Exception:
             text = _("Error! Could not make monitor.")
-            print(text)
-            self.dialogue_box.write("{} \n".format(text))
+            self.write_to_dialogue(text)
             return False
 
         # extract monitor's device and port IDs.
+
+        monitor = self.get_monitor_IDs(monitor_name)
+
+        # attempt to make monitor once IDs have been found.
+
+        if monitor is not None:
+            [device, port] = monitor
+            monitor_error = self.monitors.make_monitor(device, port, self.cycles_completed)
+            if monitor_error == self.monitors.NO_ERROR:
+                text = _("Successfully made monitor.")
+            else:
+                text = _("Error! Could not make monitor.")
+
+        self.canvas.render()
+        self.write_to_dialogue(text)
+        self.reset_monitor_lists()
+
+    def get_monitor_IDs(self, monitor_name):
+        '''extract monitor's device and port IDs and return them.'''
 
         device_name_list = []
         port_name_list = []
@@ -895,24 +875,10 @@ Paragraph comments must be enclosed between two '#' characters.
             port_id = self.names.query(port_name)
 
         monitor = [device_id, port_id]
+        return monitor
 
-        # attempt to make monitor once IDs have been found.
-
-        if monitor is not None:
-            [device, port] = monitor
-            monitor_error = self.monitors.make_monitor(device, port, self.cycles_completed)
-            if monitor_error == self.monitors.NO_ERROR:
-                text = _("Successfully made monitor.")
-                print(text)
-            else:
-                text = _("Error! Could not make monitor.")
-                print(text)
-
-        self.canvas.render()
-        self.dialogue_box.write("{} \n".format(text))
-
-        # reset lists available to add and zap monitors from
-
+    def reset_monitor_lists(self):
+        '''reset lists available to add and zap monitors from'''
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
         self.monitored.SetItems(self.monitored_list)
@@ -921,11 +887,15 @@ Paragraph comments must be enclosed between two '#' characters.
         self.unmonitored_list = self.monitors.get_signal_names()[1]
         self.not_monitored.SetItems(self.unmonitored_list)
 
+    def write_to_dialogue(self, text):
+        '''Write test to the dialogue box and print to the console.'''
+        print(text)
+        self.dialogue_box.write("{} \n".format(text))
+
     def on_toggle_view_button(self, event):
         """Handle the user requesting to change between 2D and 3D view."""
         text = _("Toggle view button pressed")
-        self.dialogue_box.write("{} \n".format(text))
-        print(text)
+        self.write_to_dialogue(text)
 
         # reset translation and zoom variables
 
@@ -943,7 +913,7 @@ Paragraph comments must be enclosed between two '#' characters.
 
         if self.canvas.choose_3D is False:
             self.canvas.choose_3D = True
-            self.canvas.pan_x = -300
+            self.canvas.pan_x = -300  # move origin to be visible on init
             self.canvas.pan_y = 300
         else:
             self.canvas.choose_3D = False
@@ -961,8 +931,7 @@ Paragraph comments must be enclosed between two '#' characters.
                 self.monitors.record_signals()
             else:
                 text = _("Error! Network oscillating.")
-                print(text)
-                self.dialogue_box.write("{} \n".format(text))
+                self.write_to_dialogue(text)
                 return False
         self.monitors.display_signals()
         return True
