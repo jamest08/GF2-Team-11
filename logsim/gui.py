@@ -12,6 +12,7 @@ import wx
 import gettext
 
 import wx.glcanvas as wxcanvas
+import wx.lib.agw.genericmessagedialog as GMD
 import numpy as np
 import math
 import os
@@ -248,7 +249,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         y = 85 + (device_number)*50
         for i in range(signal_list_length):
             x = (i * 20) + 40 + margin*10
-            x_next = (i * 20) + 60 + margin*10
             self.render_text_2D(str(i), x, y)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
@@ -714,9 +714,14 @@ Paragraph comments must be enclosed between two '#' characters.
         if Id == wx.ID_EXIT:
             self.Close(True)
         if Id == wx.ID_HELP_CONTEXT:
-            wx.MessageBox(self.EBNF_text,
-                          _("Rules for the user definition file."),
-                          wx.ICON_INFORMATION | wx.OK)
+            text = "EBNF Button Pressed"
+            self.dialogue_box.write("{} \n \n".format(text))
+            ebnf_box = wx.GenericMessageDialog(None, "EBNF Rules",
+                                        "Rules for the User Definition File",
+                                        wx.ICON_INFORMATION)
+            ebnf_box.SetExtendedMessage(self.EBNF_text)
+            ebnf_box.ShowModal()
+            
         if Id == wx.ID_HELP:
             text = _("Help button pressed.")
             self.dialogue_box.write("{} \n \n".format(text))
