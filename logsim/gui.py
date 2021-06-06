@@ -28,8 +28,8 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
-
 import builtins
+
 
 class MyGLCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
@@ -128,7 +128,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glOrtho(0, size.width, size.height, 0, -1, 1)
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
-    
+
     def init_3D(self):
         """Configure and initialise the OpenGL context for a 3D render."""
         size = self.GetClientSize()
@@ -175,18 +175,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         GL.glTranslatef(0, 0, -self.depth_offset)
 
-        # rotate the waveforms to start a viewable angle
-
-        # x = 40
-        # y = 40
-        # GL.glRotatef(math.sqrt((x * x) + (y * y)), y, x, 0)
-
         # Modelling transformation - pan, zoom and rotate
 
         GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
         GL.glMultMatrixf(self.scene_rotate)
         GL.glScalef(self.zoom, self.zoom, self.zoom)
-        GL.glRotatef(45, 1, 1, 0)
+        GL.glRotatef(45, 1, 1, 0)  # rotate view to more agreeable start point.
 
     def render(self):
         """Handle directing render command to the 2D or 3D handler."""
@@ -247,7 +241,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glEnd()
 
             device_number += 1
-        
+
         # draw x axis
 
         x = 10
@@ -310,7 +304,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                     self.draw_cuboid(x, z, 5, 10, 11)
 
             device_number += 1
-        
+
         # draw axis for number of cycles.
 
         for i in range(signal_list_length):
@@ -386,7 +380,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.on_mouse_2D(event)
         else:
             self.on_mouse_3D(event)
-    
+
     def on_mouse_2D(self, event):
         """Handle mouse events for a 2D render."""
         text = ""
@@ -463,7 +457,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init = False
 
         self.Refresh()  # triggers the paint event
-        
 
     def render_text_2D(self, text, x_pos, y_pos):
         """Handle text drawing operations for a 2D render."""
@@ -480,7 +473,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_text_3D(self, text, x_pos, y_pos, z_pos):
         """Handle text drawing operations for a 3D render."""
-        GL.glColor3f(1, 1, 1)  # text in white
+        GL.glColor3f(1, 1, 1)  # text in white
         GL.glDisable(GL.GL_LIGHTING)
         GL.glRasterPos3f(x_pos, y_pos, z_pos)
         font = GLUT.GLUT_BITMAP_HELVETICA_18
@@ -522,7 +515,6 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(600, 530))
 
-     
         # Configure the menu bar
         fileMenu = wx.Menu()
         helpMenu = wx.Menu()
@@ -551,7 +543,7 @@ class Gui(wx.Frame):
         self.spin_value = 0
         self.run_text = wx.StaticText(self, wx.ID_ANY, _('Run Simulation'))
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "0")
-        self.run_button = wx.Button(self, wx.ID_ANY,_("Run"))
+        self.run_button = wx.Button(self, wx.ID_ANY, _("Run"))
         self.continue_button = wx.Button(self, wx.ID_ANY, _("Continue"))
 
         # Declare "manage switches items"
@@ -580,7 +572,7 @@ class Gui(wx.Frame):
 
         self.add_monitor_button = wx.Button(self, wx.ID_ANY, _("Add"))
         self.zap_monitor_button = wx.Button(self, wx.ID_ANY, _("Zap"))
-        
+
         # declare bottom items
 
         self.toggle_view_button = wx.Button(self, wx.ID_ANY, _("Toggle 2D/3D"))
@@ -702,8 +694,6 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.monitors = monitors
         self.network = network
 
-        
-
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         print("menu button pressed")
@@ -719,7 +709,8 @@ monitor = “monitor”, output, {output}, “;” ;"""
             self.dialogue_box.write("{} \n \n".format(text))
             self.dialogue_box.write("{} \n \n".format(self.help_text))
         if Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by James Thompson, Anna Mills and Neelay Sant\n2021",
+            wx.MessageBox("""Logic Simulator
+                          \nCreated by James Thompson, Anna Mills and Neelay Sant\n2021""",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
@@ -922,7 +913,7 @@ monitor = “monitor”, output, {output}, “;” ;"""
         self.canvas.pan_x = 0
         self.canvas.pan_y = 0
         self.canvas.last_mouse_x = 0
-        self.canvas.last_mouse_y = 0 
+        self.canvas.last_mouse_y = 0
         self.canvas.zoom = 1
 
         # reset the scene rotation matrix

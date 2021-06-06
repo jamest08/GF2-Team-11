@@ -78,7 +78,7 @@ def main(arg_list):
             #internationalisation
             builtins._ = wx.GetTranslation
             locale = wx.Locale()
-            if os.environ['LANG'] == "ja_JP.UTF-8":
+            if os.getenv('LANG') == "ja_JP.UTF-8":
 
                 locale.Init(wx.LANGUAGE_JAPANESE)
             else:
@@ -87,8 +87,6 @@ def main(arg_list):
                 del locale
                 locale = wx.Locale()
                 locale.Init(wx.LANGUAGE_DEFAULT)
-            print(locale.GetLanguageCanonicalName(locale.GetSystemLanguage()))
-            print(os.environ['LANG'])
                 
             locale.AddCatalogLookupPathPrefix('./locale')
             locale.AddCatalog('jap')
