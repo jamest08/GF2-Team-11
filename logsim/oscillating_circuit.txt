@@ -1,5 +1,5 @@
 define A as AND 2 inputs;
-define N as NAND 1 inputs;
+define N as NOR 1 inputs;
 define SW1 as SWITCH 1 state;
 connect SW1 to A.I1;
 connect A to N.I1;
