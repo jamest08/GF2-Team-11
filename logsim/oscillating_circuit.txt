@@ -6,3 +6,4 @@ connect A to N.I1;
 connect N to A.I2;
 monitor A;
 END
+

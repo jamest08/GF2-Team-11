@@ -14,3 +14,4 @@ connect A1 to O1.I1;
 connect A2 to O1.I2;
 monitor X2 O1;
 END
+
