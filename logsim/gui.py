@@ -866,7 +866,7 @@ class Gui(wx.Frame):
 
         Return True if successful.
         """
-        for _ in range(cycles):
+        for i in range(cycles):
             if self.network.execute_network():
                 self.monitors.record_signals()
             else:
@@ -875,36 +875,6 @@ class Gui(wx.Frame):
                 return False
         self.monitors.display_signals()
         return True
-
-    def updateLanguage(self, lang):
-        """
-        Update the language to the requested one.
-
-        Make *sure* any existing locale is deleted before the new
-        one is created.  The old C++ object needs to be deleted
-        before the new one is created, and if we just assign a new
-        instance to the old Python variable, the old C++ locale will
-        not be destroyed soon enough, likely causing a crash.
-
-        :param string `lang`: one of the supported language codes
-
-        """
-        # if an unsupported language is requested default to English
-        if lang == "ja_JP.utf8":
-            selLang = wx.LANGUAGE_JAPANESE
-        else:
-            selLang = wx.LANGUAGE_ENGLISH
-
-        if self.mylocale:
-            assert sys.getrefcount(self.mylocale) <= 2
-            del self.mylocale
-
-        # create a locale object for this language
-        self.mylocale = wx.Locale(selLang)
-        if self.mylocale.IsOk():
-            self.mylocale.AddCatalog("jap")
-        else:
-            self.mylocale = None
 
     def define_long_texts(self):
         """Initialise long texts used in the GUI"""
