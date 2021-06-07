@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-06-06 14:43+0100\n"
-"PO-Revision-Date: 2021-06-06 14:47+0100\n"
+"POT-Creation-Date: 2021-06-07 11:37+0100\n"
+"PO-Revision-Date: 2021-06-07 11:40+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,67 +16,135 @@ msgstr ""
 "Language: ja\n"
 "X-Generator: Poedit 3.0\n"
 
-#: gui.py:523
+#: gui.py:541
 msgid "File"
 msgstr "ファイル"
 
-#: gui.py:524
+#: gui.py:542
 msgid "&About"
 msgstr "&約"
 
-#: gui.py:525
+#: gui.py:543
 msgid "&Exit"
 msgstr "&出口"
 
-#: gui.py:527
+#: gui.py:545
 msgid "Help"
 msgstr "助けて"
 
-#: gui.py:528 gui.py:532
+#: gui.py:546 gui.py:550
 msgid "&Help"
 msgstr "&助けて"
 
-#: gui.py:531
+#: gui.py:549
 msgid "&File"
 msgstr "ファイル"
 
-#: gui.py:544
+#: gui.py:562
 msgid "Run Simulation"
 msgstr "シミュレーションを開始"
 
-#: gui.py:546
+#: gui.py:564
 msgid "Run"
 msgstr "開始"
 
-#: gui.py:547
+#: gui.py:565
 msgid "Continue"
 msgstr "継続する"
 
-#: gui.py:551
+#: gui.py:569
 msgid "Manage Switches"
 msgstr "スイッチを管理する"
 
-#: gui.py:561
+#: gui.py:579
 msgid "Switch"
 msgstr "スイッチ"
 
-#: gui.py:565
+#: gui.py:583
 msgid "Manage Monitors"
 msgstr "モニターを管理する"
 
-#: gui.py:573
+#: gui.py:591
 msgid "Add"
 msgstr "追加"
 
-#: gui.py:574
+#: gui.py:592
 msgid "Zap"
 msgstr "削除する"
 
-#: gui.py:578
+#: gui.py:596
 msgid "Toggle 2D/3D"
 msgstr "変化する 2D/3D"
 
-#: gui.py:582
+#: gui.py:673
+msgid "EBNF Button Pressed"
+msgstr "EBNF ボタンが押されました"
+
+#: gui.py:676
+msgid "Rules for the user definition file."
+msgstr "ユーザー定義ファイルのルール."
+
+#: gui.py:681
+msgid "Help button pressed."
+msgstr "ヘルプボタンが押されました."
+
+#: gui.py:687
+msgid "About Logsim"
+msgstr "約 Logsim"
+
+#: gui.py:693
+msgid "New spin control value: {} \n"
+msgstr "新しいスピン制御値: {}\n"
+
+#: gui.py:706
+msgid "Running for {} cycles\n"
+msgstr "{} サイクル実行\n"
+
+#: gui.py:722
+msgid "Error! Nothing to continue. Run first.\n"
+msgstr "エラー！続行するものはありません。最初に開始します。\n"
+
+#: gui.py:725
+msgid ""
+"Continuing for {} cycles. \n"
+"Total: {} \n"
+msgstr ""
+"{}サイクル継続.\n"
+"合計: {}\n"
+
+#: gui.py:744
+msgid "Successfully set switch."
+msgstr "見事にスイッチ交換。"
+
+#: gui.py:746
+msgid "Error! Invalid switch."
+msgstr "エラー！無効なスイッチです。"
+
+#: gui.py:758 gui.py:770
+msgid "Error! Could not zap monitor."
+msgstr "エラー！このモニターを削除できませんでした。"
+
+#: gui.py:768
+msgid "Successfully zapped monitor"
+msgstr "モニターが正常に削除されました"
+
+#: gui.py:784 gui.py:797
+msgid "Error! Could not make monitor."
+msgstr "エラー！モニターできませんでした."
+
+#: gui.py:795
+msgid "Successfully made monitor."
+msgstr "モニターの作成に成功しました。"
+
+#: gui.py:846
+msgid "Toggle view button pressed"
+msgstr "ヘルプボタンが押されました"
+
+#: gui.py:873
+msgid "Error! Network oscillating."
+msgstr "エラー！ネットワーク振動。"
+
+#: gui.py:881
 msgid ""
 "HELP MENU: \n"
 "\n"
@@ -129,71 +197,3 @@ msgstr ""
 "「左クリック」を押しながらドラッグすると、ビューが回転します。\n"
 "\n"
 "いずれかのビューでスクロールすると、ズームインおよびズームアウトします。"
-
-#: gui.py:712
-msgid "menu button pressed"
-msgstr "ヘルプボタンが押されました."
-
-#: gui.py:718
-msgid "Rules for the user definition file."
-msgstr "ユーザー定義ファイルのルール."
-
-#: gui.py:721
-msgid "Help button pressed."
-msgstr "ヘルプボタンが押されました."
-
-#: gui.py:727
-msgid "About Logsim"
-msgstr "約 Logsim"
-
-#: gui.py:734
-msgid "New spin control value: {} \n"
-msgstr "新しいスピン制御値: {}\n"
-
-#: gui.py:753
-msgid "Running for {} cycles\n"
-msgstr "{} サイクル実行\n"
-
-#: gui.py:763
-msgid "Error! Nothing to continue. Run first."
-msgstr "エラー！最初に実行します。"
-
-#: gui.py:772
-msgid ""
-"Continuing for {} cycles. \n"
-"Total: {} \n"
-msgstr ""
-"{}サイクル継続.\n"
-"合計: {}\n"
-
-#: gui.py:787
-msgid "Successfully set switch."
-msgstr "見事にスイッチ交換。"
-
-#: gui.py:790
-msgid "Error! Invalid switch."
-msgstr "エラー！無効なスイッチです。"
-
-#: gui.py:803 gui.py:840
-msgid "Error! Could not zap monitor."
-msgstr "エラー！このモニターを削除できませんでした。"
-
-#: gui.py:837
-msgid "Successfully zapped monitor"
-msgstr "モニターが正常に削除されました"
-
-#: gui.py:864 gui.py:902
-msgid "Error! Could not make monitor."
-msgstr "エラー！モニターできませんでした."
-
-#: gui.py:899
-msgid "Successfully made monitor."
-msgstr "モニターの作成に成功しました。"
-
-#: gui.py:920
-msgid "Toggle view button pressed"
-msgstr "ヘルプボタンが押されました."
-
-#: gui.py:957
-msgid "Error! Network oscillating."
-msgstr "エラー！ネットワーク振動。"

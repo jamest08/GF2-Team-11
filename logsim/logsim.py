@@ -87,7 +87,6 @@ def main(arg_list):
                 del locale
                 locale = wx.Locale()
                 locale.Init(wx.LANGUAGE_DEFAULT)
-
             locale.AddCatalogLookupPathPrefix('./locale')
             locale.AddCatalog('jap')
 

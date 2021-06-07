@@ -665,12 +665,13 @@ class Gui(wx.Frame):
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
-        print("menu button pressed")
+        print("Menu button pressed\n")
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
         if Id == wx.ID_HELP_CONTEXT:
-            text = "EBNF Button Pressed"
+            text = _("EBNF Button Pressed")
+            print("EBNF Button Pressed\n")
             self.write_to_dialogue(text)
             ebnf_box = wx.GenericMessageDialog(None, self.EBNF_text,
                                                _("Rules for the user definition file."),
@@ -691,6 +692,7 @@ class Gui(wx.Frame):
         spin_value = self.spin.GetValue()
         self.spin_value = spin_value
         text = _("New spin control value: {} \n").format(str(spin_value))
+        print("New spin control value: {} \n".format(str(spin_value)))
         self.write_to_dialogue(text)
 
     def on_run_button(self, event):
@@ -704,6 +706,7 @@ class Gui(wx.Frame):
         if cycles is not None:  # if the number of cycles provided is valid
             self.monitors.reset_monitors()
             text = _("Running for {} cycles\n").format(str(cycles))
+            print(("Running for {} cycles\n").format(str(cycles)))
             self.devices.cold_startup()
             if self.run_network(cycles):
                 self.cycles_completed += cycles
@@ -719,11 +722,14 @@ class Gui(wx.Frame):
         cycles = self.spin_value
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
-                text = "Error! Nothing to continue. Run first.\n"
+                text = _("Error! Nothing to continue. Run first.\n")
+                print("Error! Nothing to continue. Run first.\n")
             elif self.run_network(cycles):
                 self.cycles_completed += cycles
                 text = _("Continuing for {} cycles. \nTotal: {} \n").format(
                     str(cycles), str(self.cycles_completed))
+                print(("Continuing for {} cycles. \nTotal: {} \n").format(
+                    str(cycles), str(self.cycles_completed)))
 
         self.canvas.render()
         self.write_to_dialogue(text)
@@ -742,8 +748,10 @@ class Gui(wx.Frame):
             if switch_state is not None:
                 if self.devices.set_switch(switch_id, switch_state):
                     text = _("Successfully set switch.")
+                    print("Successfully set switch.\n")
                 else:
                     text = _("Error! Invalid switch.")
+                    print("Error! Invalid switch.\n")
 
         self.write_to_dialogue(text)
 
@@ -756,6 +764,7 @@ class Gui(wx.Frame):
             monitor_name = self.monitored.GetString(self.monitored.GetSelection())
         except Exception:
             text = _("Error! Could not zap monitor.")
+            print("Error! Could not zap monitor.\n")
             self.write_to_dialogue(text)
             return False
         monitor = self.get_monitor_IDs(monitor_name)
@@ -766,8 +775,10 @@ class Gui(wx.Frame):
             [device, port] = monitor
             if self.monitors.remove_monitor(device, port):
                 text = _("Successfully zapped monitor")
+                print("Successfully zapped monitor\n")
             else:
                 text = _("Error! Could not zap monitor.")
+                print("Error! Could not zap monitor.\n")
 
         self.canvas.render()
         self.write_to_dialogue(text)
@@ -782,6 +793,7 @@ class Gui(wx.Frame):
             monitor_name = self.not_monitored.GetString(self.not_monitored.GetSelection())
         except Exception:
             text = _("Error! Could not make monitor.")
+            print("Error! Could not make monitor.\n")
             self.write_to_dialogue(text)
             return False
         monitor = self.get_monitor_IDs(monitor_name)
@@ -793,8 +805,10 @@ class Gui(wx.Frame):
             monitor_error = self.monitors.make_monitor(device, port, self.cycles_completed)
             if monitor_error == self.monitors.NO_ERROR:
                 text = _("Successfully made monitor.")
+                print("Successfully made monitor.\n")
             else:
                 text = _("Error! Could not make monitor.")
+                print("Error! Could not make monitor.\n")
 
         self.canvas.render()
         self.write_to_dialogue(text)
@@ -838,7 +852,6 @@ class Gui(wx.Frame):
 
     def write_to_dialogue(self, text):
         '''Write text to the dialogue box and print to the console.'''
-        print(text)
         self.dialogue_box.write("{} \n".format(text))
 
     def on_toggle_view_button(self, event):
@@ -871,6 +884,7 @@ class Gui(wx.Frame):
                 self.monitors.record_signals()
             else:
                 text = _("Error! Network oscillating.")
+                print("Error! Network oscillating.\n")
                 self.write_to_dialogue(text)
                 return False
         self.monitors.display_signals()

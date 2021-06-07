@@ -53,14 +53,17 @@ class Scanner:
     -------------
     get_symbol(self): Translates the next sequence of characters into a symbol
                       and returns the symbol.
+    display_error(self, error_message): Displays the error line and error
+                        message
+
+    Private methods
+    --------------
     skip_spaces(self): Finds the next non whitespace character in the file.
     get_number(self): Finds all digits in a number
     open_file(self): Opens the specified definition file
     get_name(self): Finds a whole name in the definition file
     skip_comment(self): Skips comments enclosed in hashes in the definition
                         file
-    display_error(self, error_message): Displays the error line and error
-                        message
     """
 
     def __init__(self, path, names):
