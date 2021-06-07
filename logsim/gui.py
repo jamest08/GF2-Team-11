@@ -68,6 +68,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GLUT.glutInit()
         self.init = False
         self.context = wxcanvas.GLContext(self)
+        self.devices = devices
+        self.monitors = monitors
 
         # Constants for OpenGL materials and lights
         self.mat_diffuse = [0.0, 0.0, 0.0, 1.0]
@@ -84,6 +86,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.full_specular = [0.5, 0.5, 0.5, 1.0]
         self.no_specular = [0.0, 0.0, 0.0, 1.0]
 
+        self.reset_transformation_variables()
+
+        # Offset between viewpoint and origin of the scene
+        self.depth_offset = 1000
+
+        # Bind events to the canvas
+        self.Bind(wx.EVT_PAINT, self.on_paint)
+        self.Bind(wx.EVT_SIZE, self.on_size)
+        self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+
+        # control whether in 2D or 3D view
+        self.choose_3D = False
+    
+    def reset_transformation_variables(self):
+        '''set all transformation variables back to initial values'''
         # Initialise variables for panning
         self.pan_x = 0
         self.pan_y = 0
@@ -95,19 +112,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Initialise variables for zooming
         self.zoom = 1
-
-        # Offset between viewpoint and origin of the scene
-        self.depth_offset = 1000
-
-        # Bind events to the canvas
-        self.Bind(wx.EVT_PAINT, self.on_paint)
-        self.Bind(wx.EVT_SIZE, self.on_size)
-        self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
-
-        self.devices = devices
-        self.monitors = monitors
-
-        self.choose_3D = False
 
     def init_gl(self):
         """Handle directing initialise command to the 2D or 3D handler."""
@@ -142,6 +146,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()  # lights positioned relative to the viewer
+
+        # set the parameters for 2 light sources in the 3D view.
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, self.no_ambient)
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, self.med_diffuse)
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, self.no_specular)
@@ -151,6 +157,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, self.no_specular)
         GL.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, self.straight_on)
 
+        # set the material properties of the rendered items
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, self.mat_specular)
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, self.mat_shininess)
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE,
@@ -171,12 +178,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glEnable(GL.GL_NORMALIZE)
 
         # Viewing transformation - set the viewpoint back from the scene
-        # Translate the waveforms to start in the top left hand corner
-
         GL.glTranslatef(0, 0, -self.depth_offset)
 
         # Modelling transformation - pan, zoom and rotate
-
         GL.glTranslatef(self.pan_x, self.pan_y, 0.0)
         GL.glMultMatrixf(self.scene_rotate)
         GL.glScalef(self.zoom, self.zoom, self.zoom)
@@ -516,6 +520,18 @@ class Gui(wx.Frame):
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(600, 530))
+        self.names = names
+        self.devices = devices
+        self.monitors = monitors
+        self.network = network
+        self.define_long_texts()
+
+        # define variables used similarly to userint class
+
+        self.cycles_completed = 0  # number of simulation cycles completed
+        self.character = ""  # current character
+        self.line = ""  # current string entered by the user
+        self.cursor = 0  # cursor position
 
         # Configure the menu bar
         fileMenu = wx.Menu()
@@ -581,62 +597,9 @@ class Gui(wx.Frame):
         self.dialogue_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                         style=wx.TE_MULTILINE | wx.TE_READONLY)
 
-        self.help_text = _(u"""HELP MENU: \n
-To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
-To continue the simulation for N cycles, select N with the scroll menu.
-Then click 'Continue'. \n
-To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.
-Then select a state for the switch to be in. Then click 'Switch'. \n
-To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.
-Then click 'Zap'. \n
-To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.
-Then click 'Add'. \n
-To toggle between the 2D and 3D view, click the 'toggle 2D/3D' button.
-It is located in the bottom left of the window. \n
-When in 2D view, holding 'left' or 'right' click and dragging will translate the view. \n
-When in 3D view, holding 'right click' and dragging will translate the view.
-Holding 'left click' and dragging will rotate the view. \n
-Scrolling in either view will zoom in and out.""")
-
-        self.EBNF_text = """EBNF RULES:
-
-digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
-
-letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
-       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
-       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
-       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
-       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
-       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
-       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
-       | "x" | "y" | "z" ;
-
-file = {definition | connection | monitor}, "END" ;
-
-definition =  “define”, name, {name}, “as”,
- ( “XOR” | “DTYPE” | switch | gate | clock | generator), “;” ;
-name = letter, {letter | digit} ;
-switch = “SWITCH”, (“0” | “1”), “state” ;
-gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
-clock = “CLOCK”, “period”, digit, {digit} ;
-generator = "SIGGEN", ("0"|"1"), "for", digit, {digit}, "cycles",
-{("0" | "1"), "for", digit, {digit}, "cycles"} ;
-
-connection = “connect”, output, “to”, input, “;” ;
-output = name, [“.Q” | “.QBAR”] ;
-input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
-
-monitor = “monitor”, output, {output}, “;” ;
-
-Comments:
-Line comments must be started with a '%' and ended by a newline.
-Paragraph comments must be enclosed between two '#' characters.
-"""
-
         # Bind events to widgets
 
         self.Bind(wx.EVT_MENU, self.on_menu)
-
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
@@ -645,6 +608,10 @@ Paragraph comments must be enclosed between two '#' characters.
         self.zap_monitor_button.Bind(wx.EVT_BUTTON, self.on_zap_button)
         self.toggle_view_button.Bind(wx.EVT_BUTTON, self.on_toggle_view_button)
 
+        self.configure_view()
+
+    def configure_view(self):
+        """Set up sizers and place objects in them."""
         # Configure sizers for layout
 
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -658,7 +625,7 @@ Paragraph comments must be enclosed between two '#' characters.
         # initialise canvas for drawing signals
 
         self.canvas = MyGLCanvas(self.scrollable, wx.DefaultPosition,
-                                 wx.Size(1000, 1000), devices, monitors)
+                                 wx.Size(1000, 1000), self.devices, self.monitors)
         self.canvas.SetSizeHints(500, 500)
         self.scrollable.SetScrollbars(20, 20, 50, 50)
         self.scrollable.Scroll(0, 0)
@@ -696,19 +663,6 @@ Paragraph comments must be enclosed between two '#' characters.
         self.SetSizeHints(600, 530)  # minimum size of entire window
         self.SetSizer(main_sizer)
 
-        # variables from userint
-
-        self.cycles_completed = 0  # number of simulation cycles completed
-
-        self.character = ""  # current character
-        self.line = ""  # current string entered by the user
-        self.cursor = 0  # cursor position
-
-        self.names = names
-        self.devices = devices
-        self.monitors = monitors
-        self.network = network
-
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         print("menu button pressed")
@@ -721,7 +675,6 @@ Paragraph comments must be enclosed between two '#' characters.
             ebnf_box = wx.GenericMessageDialog(None, self.EBNF_text,
                                                _("Rules for the user definition file."),
                                                wx.ICON_INFORMATION)
-            # ebnf_box.SetExtendedMessage(self.EBNF_text)
             ebnf_box.ShowModal()
 
         if Id == wx.ID_HELP:
@@ -805,7 +758,6 @@ Paragraph comments must be enclosed between two '#' characters.
             text = _("Error! Could not zap monitor.")
             self.write_to_dialogue(text)
             return False
-
         monitor = self.get_monitor_IDs(monitor_name)
 
         # attempt to zap monitor once IDs have been found.
@@ -832,9 +784,6 @@ Paragraph comments must be enclosed between two '#' characters.
             text = _("Error! Could not make monitor.")
             self.write_to_dialogue(text)
             return False
-
-        # extract monitor's device and port IDs.
-
         monitor = self.get_monitor_IDs(monitor_name)
 
         # attempt to make monitor once IDs have been found.
@@ -888,7 +837,7 @@ Paragraph comments must be enclosed between two '#' characters.
         self.not_monitored.SetItems(self.unmonitored_list)
 
     def write_to_dialogue(self, text):
-        '''Write test to the dialogue box and print to the console.'''
+        '''Write text to the dialogue box and print to the console.'''
         print(text)
         self.dialogue_box.write("{} \n".format(text))
 
@@ -897,16 +846,7 @@ Paragraph comments must be enclosed between two '#' characters.
         text = _("Toggle view button pressed")
         self.write_to_dialogue(text)
 
-        # reset translation and zoom variables
-
-        self.canvas.pan_x = 0
-        self.canvas.pan_y = 0
-        self.canvas.last_mouse_x = 0
-        self.canvas.last_mouse_y = 0
-        self.canvas.zoom = 1
-
-        # reset the scene rotation matrix
-        self.canvas.scene_rotate = np.identity(4, 'f')
+        self.canvas.reset_transformation_variables()
         self.canvas.init = False
 
         # handle the change of view
@@ -965,3 +905,57 @@ Paragraph comments must be enclosed between two '#' characters.
             self.mylocale.AddCatalog("jap")
         else:
             self.mylocale = None
+
+    def define_long_texts(self):
+        """Initialise long texts used in the GUI"""
+        self.help_text = _(u"""HELP MENU: \n
+To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
+To continue the simulation for N cycles, select N with the scroll menu.
+Then click 'Continue'. \n
+To toggle a switch, select the switch from the 'Manage Switches' drop-down menu.
+Then select a state for the switch to be in. Then click 'Switch'. \n
+To remove a monitor point, choose one from the first 'Manage Monitors' drop-down menu.
+Then click 'Zap'. \n
+To add a monitor point, choose one from the second 'Manage Monitors' drop-down menu.
+Then click 'Add'. \n
+To toggle between the 2D and 3D view, click the 'toggle 2D/3D' button.
+It is located in the bottom left of the window. \n
+When in 2D view, holding 'left' or 'right' click and dragging will translate the view. \n
+When in 3D view, holding 'right click' and dragging will translate the view.
+Holding 'left click' and dragging will rotate the view. \n
+Scrolling in either view will zoom in and out.""")
+
+        self.EBNF_text = """EBNF RULES:
+
+digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
+
+letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       | "x" | "y" | "z" ;
+
+file = {definition | connection | monitor}, "END" ;
+
+definition =  “define”, name, {name}, “as”,
+ ( “XOR” | “DTYPE” | switch | gate | clock | generator), “;” ;
+name = letter, {letter | digit} ;
+switch = “SWITCH”, (“0” | “1”), “state” ;
+gate = (“NAND” | “AND” | “OR” | “NOR” ), digit, {digit}, “inputs”;
+clock = “CLOCK”, “period”, digit, {digit} ;
+generator = "SIGGEN", ("0"|"1"), "for", digit, {digit}, "cycles",
+{("0" | "1"), "for", digit, {digit}, "cycles"} ;
+
+connection = “connect”, output, “to”, input, “;” ;
+output = name, [“.Q” | “.QBAR”] ;
+input = name, “.”, (“DATA” | “CLK” | “SET” | “CLEAR” | “I”, digit, {digit}) ;
+
+monitor = “monitor”, output, {output}, “;” ;
+
+Comments:
+Line comments must be started with a '%' and ended by a newline.
+Paragraph comments must be enclosed between two '#' characters.
+"""
