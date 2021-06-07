@@ -45,9 +45,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     Public methods
     --------------
+    reset_tranformation_variables(self): Resets variables to init state
+
     init_gl(self): Configures the OpenGL context.
 
     render(self): Handles all drawing operations.
+
+    draw_cuboid(self, x_pos, z_pos, half_width, half_depth, height): Renders
+                            a cuboid in 3D view at the specified coordinates.
 
     on_paint(self, event): Handles the paint event.
 
@@ -57,6 +62,32 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
+
+    Private methods
+    ---------------
+    init_2D(self): Called from init_gl.
+                   Configures OpenGL 2D context.
+
+    init_3D(self): Called from init_gl.
+                   Configures OpenGL 3D context.
+
+    render_2D(self): Called from render.
+                     Handles 2D view rendering.
+
+    render_3D(self): Called from render.
+                     Handles 3D view rendering.
+
+    on_mouse_2D(self, event): Called from on_mouse.
+                              Handles mouse events in 2D view.
+
+    on_mouse_3D(self, event): Called from on_mouse.
+                              Handles mouse events in 3D view.
+
+    render_text_2D(self, text, x_pos, y_pos, text_small): Called from render.
+                        Handles all text writing on the canvas for the 2D view.
+
+    render_text_3D(self, text, x_pos, y_pos, text_small): Called from render.
+                        Handles all text writing on the canvas for the 3D view.
     """
 
     def __init__(self, parent, pos, size, devices, monitors):
@@ -98,9 +129,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # control whether in 2D or 3D view
         self.choose_3D = False
-    
+
     def reset_transformation_variables(self):
-        '''set all transformation variables back to initial values'''
+        """Set all transformation variables back to initial values."""
         # Initialise variables for panning
         self.pan_x = 0
         self.pan_y = 0
@@ -512,9 +543,44 @@ class Gui(wx.Frame):
                            control value.
 
     on_run_button(self, event): Event handler for when the user clicks the run
-                                button.
+                                button. Runs the number of cycles chosen by the
+                                current spin value.
+
+    on_continue_button(self, event): Event handler for when the user clicks the
+                                continue button. Continues the simulation for a
+                                number of cycles chosen by the current spin value.
+
+    on_switch_button(self, event): Event handler for when the user clicks the
+                                switch button. Changes the state of the selected switch.
+
+    on_zap_button(self, event): Event handler for when the user clicks the
+                                zap button. Zaps the chosen monitor.
+
+    on_add_button(self, event): Event handler for when the user clicks the
+                                add button. Adds the chosen monitor.
+
+    get_monitor_IDs(self, monitor_name): Takes an argument of the monitor
+                    point name. Returns the IDs of the device and port associated
+                    in a list of the form [device_id, port_id].
 
     on_text_box(self, event): Event handler for when the user enters text.
+
+    write_to_dialogue(self, text): Prints text in the dialogue box with a line
+                                   between each call.
+
+    run_network(self, cycles): Runs the network for the specified number of
+                               simulation cycles.
+
+    Private methods
+    ---------------
+    configure_view(self): Initialises all widgets into appropriate places
+                          on the GUI.
+
+    reset_monitor_lists(self): Called from zap and add button event handlers.
+                               Used to reset the lists for the drop-down menus.
+
+    define_long_texts(self): Defines long text inputs for use in the GUI.
+
     """
 
     def __init__(self, title, path, names, devices, network, monitors):
@@ -815,8 +881,7 @@ class Gui(wx.Frame):
         self.reset_monitor_lists()
 
     def get_monitor_IDs(self, monitor_name):
-        '''extract monitor's device and port IDs and return them.'''
-
+        """Extract monitor's device and port IDs and return them."""
         device_name_list = []
         port_name_list = []
         is_device = True  # keep track of when '.' is hit.
@@ -841,7 +906,7 @@ class Gui(wx.Frame):
         return monitor
 
     def reset_monitor_lists(self):
-        '''reset lists available to add and zap monitors from'''
+        """Reset lists available to add and zap monitors from."""
         self.monitored.Clear()
         self.monitored_list = self.monitors.get_signal_names()[0]
         self.monitored.SetItems(self.monitored_list)
@@ -851,7 +916,7 @@ class Gui(wx.Frame):
         self.not_monitored.SetItems(self.unmonitored_list)
 
     def write_to_dialogue(self, text):
-        '''Write text to the dialogue box and print to the console.'''
+        """Write text to the dialogue box and print to the console."""
         self.dialogue_box.write("{} \n".format(text))
 
     def on_toggle_view_button(self, event):
@@ -891,7 +956,7 @@ class Gui(wx.Frame):
         return True
 
     def define_long_texts(self):
-        """Initialise long texts used in the GUI"""
+        """Initialise long texts used in the GUI."""
         self.help_text = _(u"""HELP MENU: \n
 To run the simulation for N cycles, select N with the scroll menu and click 'Run'. \n
 To continue the simulation for N cycles, select N with the scroll menu.

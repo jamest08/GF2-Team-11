@@ -211,9 +211,6 @@ def test_display_error_raises_exceptions(scanner_one):
 def test_display_error(scanner_one):
     """Check if the display error function is producing the expected output"""
 
-    """ Will check if print statements are appropriate from manual testing,
-    since the function does not output any information about the print"""
-
     # check if next read position is on next line after an error is flagged
 
     scanner = scanner_one
@@ -225,3 +222,4 @@ def test_display_error(scanner_one):
 
     symbol = scanner.get_symbol()  # expecting this symbol to be 'define'
     assert symbol.id == scanner.define_ID
+    assert scanner.error_message_list == ["error_message"]
