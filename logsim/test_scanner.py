@@ -57,6 +57,22 @@ def scanner_three():
     scanner = Scanner(path, names)
     return scanner
 
+@pytest.fixture
+def scanner_error():
+    """Return an instance of a scanner using example 2 with comments"""
+    print("\nNow opening file...")
+
+    # Print the path provided and try to open the file for reading
+    cwd = os.getcwd()
+    example = "example2_with_syntax_errors.txt"
+
+    path = "{}/{}".format(cwd, example)
+    print(path)
+    names = Names()
+
+    scanner = Scanner(path, names)
+    return scanner
+
 
 def test_innit_raises_exceptions():
     names = Names()
@@ -208,7 +224,7 @@ def test_display_error_raises_exceptions(scanner_one):
         var = scanner.display_error(12)
 
 
-def test_display_error(scanner_one):
+def test_display_error(scanner_one, scanner_error):
     """Check if the display error function is producing the expected output"""
 
     # check if next read position is on next line after an error is flagged
@@ -223,3 +239,25 @@ def test_display_error(scanner_one):
     symbol = scanner.get_symbol()  # expecting this symbol to be 'define'
     assert symbol.id == scanner.define_ID
     assert scanner.error_message_list == ["error_message"]
+
+    # test correct line of error is outputted
+
+    for i in range(5):
+        symbol = scanner_error.get_symbol()
+    
+    error_line = scanner_error.display_error("error_message")
+    assert error_line == "define CL1 as CLOCK  1"
+
+    for i in range(9):
+        symbol = scanner_error.get_symbol()
+    
+    error_line = scanner_error.display_error("error_message")
+    assert error_line == "define  as SWITCH 0 state;"
+
+    # after reaching end of file, error line should be empty
+
+    for i in range(150):
+        symbol = scanner_error.get_symbol()
+    
+    error_line = scanner_error.display_error("error_message")
+    assert error_line == ""

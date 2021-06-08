@@ -255,15 +255,19 @@ class Scanner:
             self.skip_spaces()
             cur_pos = self.file.tell()
             self.file.seek(cur_pos-1, 0)
+        
+        error_line = ''
 
         if type(error_message) != str:
             raise TypeError("Error message not a string")
         else:
             if caret:  # caret True when need error line to be printed
-                print(self.file.readline().strip())
+                error_line = self.file.readline().strip()
+                print(error_line)
                 print(" "*(difference-3), end='')
                 print("^")
             print("***ERROR: {}".format(error_message))
             print('\n')
 
         self.last_semicolon_pos = self.file.tell()
+        return error_line
